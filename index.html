@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="La mia porzione">
+<meta name="theme-color" content="#2E5E3E">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>La mia porzione</title>
+<style>
+:root{--bg:#F3F6F1;--surface:#FFFFFF;--ink:#1D2A22;--muted:#5F6D64;--line:#D7E0D8;--accent:#2E5E3E;--accent-ink:#FFFFFF;--soft:#E3EEE5;--warm:#C9762B;--warmbg:#FBEFE1;
+  color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#121815;--surface:#1A221E;--ink:#E6EEE8;--muted:#9BA9A1;--line:#2C3832;--accent:#7FC495;--accent-ink:#0F1A13;--soft:#22312A;--warm:#E9A64B;--warmbg:#3A2C17;color-scheme:dark}}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Calibri,"Segoe UI",sans-serif;font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:560px;margin:0 auto;padding:16px 18px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:26px;line-height:1.15;margin:6px 0}
+.gear{border:0;background:transparent;color:var(--muted);font-size:22px;padding:6px;cursor:pointer}
+.lead{color:var(--muted);margin:0 0 16px}
+h2{font-size:17px;margin:20px 0 8px}
+.meals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.meals button{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px 6px;cursor:pointer}
+.meals button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.big{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink);text-align:center}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:500}
+.btn[disabled]{opacity:.45;cursor:default}
+.grow{flex:1}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumb{position:relative;width:76px;height:96px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb button{position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:15px;line-height:26px;padding:0;cursor:pointer}
+textarea,input[type=text],input[type=password]{width:100%;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:11px 12px}
+textarea{min-height:120px;resize:vertical}
+details.paste{margin-top:10px}
+details.paste summary{cursor:pointer;color:var(--muted)}
+.go{width:100%;margin-top:18px;font-size:18px;padding:16px}
+.status{margin-top:14px;color:var(--muted);text-align:center;min-height:1.5em}
+.err{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--warmbg);color:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 18px 8px;margin-top:6px}
+.card h3{font-size:23px;line-height:1.2;margin:0 0 4px}
+.card .sub{color:var(--muted);font-size:15px;margin:0 0 10px}
+.card h4{font-size:16px;margin:16px 0 6px;color:var(--accent)}
+.card ul,.card ol{margin:0;padding-left:22px}
+.card li{margin:3px 0}
+.together{background:var(--soft);border-radius:14px;padding:10px 14px;margin-top:14px}
+.together h4{margin-top:4px}
+.note{font-size:15px;color:var(--muted);margin:12px 0 8px}
+.saved{list-style:none;padding:0;margin:0}
+.saved li{display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.saved button.open{flex:1;text-align:left;font:inherit;background:transparent;border:0;color:var(--ink);padding:12px 2px;cursor:pointer}
+.saved button.del{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;padding:8px}
+.hidden{display:none!important}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--soft);padding:4px;border-radius:14px}
+.tabs button{font:inherit;font-size:15px;border:0;border-radius:11px;padding:10px 4px;background:transparent;color:var(--ink);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.pane{margin-top:10px}
+.switch{display:flex;align-items:flex-start;gap:10px;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.switch input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent)}
+.switch small{display:block;color:var(--muted);font-size:14px}
+.rowhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.linkbtn{font:inherit;font-size:15px;border:0;background:transparent;color:var(--accent);cursor:pointer;padding:6px 0}
+.setup{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.setup p{margin:6px 0 12px}
+.setup a{color:var(--accent)}
+button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1>La mia porzione</h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+
+  <section id="setup" class="setup hidden">
+    <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
+    <p>Incolla la chiave di Google Gemini. Resta salvata solo su questo telefono.</p>
+    <p><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Crea la chiave su Google AI Studio</a></p>
+    <input type="password" id="key" placeholder="Chiave Gemini" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label></p>
+    <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
+  </section>
+
+  <section id="main">
+    <p class="lead">Fotografa una ricetta, incollala, scrivi un'idea o usa il link di una pagina: te la preparo nella porzione giusta per te.</p>
+    <h2>Per quale pasto?</h2>
+    <div class="meals" id="meals"></div>
+
+    <h2>La ricetta</h2>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-src="foto" aria-selected="true">Foto</button>
+      <button role="tab" data-src="testo" aria-selected="false">Testo</button>
+      <button role="tab" data-src="link" aria-selected="false">Pagina web</button>
+    </div>
+    <div class="pane" data-pane="foto">
+      <div class="big">
+        <label class="btn grow" for="cam">Fotografa</label>
+        <label class="btn ghost grow" for="lib">Dalla galleria</label>
+      </div>
+      <input id="cam" type="file" accept="image/*" capture="environment" class="hidden">
+      <input id="lib" type="file" accept="image/*" multiple class="hidden">
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div class="pane hidden" data-pane="testo">
+      <textarea id="text" placeholder="Incolla una ricetta oppure scrivi un'idea, per esempio: pasta e piselli come la fa la nonna"></textarea>
+    </div>
+    <div class="pane hidden" data-pane="link">
+      <input type="text" id="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Incolla l'indirizzo della pagina (https://…)">
+    </div>
+    <label class="switch"><input type="checkbox" id="veg" checked><span>Versione vegetariana<small>Con latte e uova: carne e pesce vengono sostituiti.</small></span></label>
+    <button class="btn go" id="go">Prepara la mia porzione</button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="err hidden" id="err"></div>
+
+    <section id="result" class="hidden"></section>
+
+    <section id="savedbox" class="hidden">
+      <div class="rowhead"><h2>Le mie ricette</h2><button class="linkbtn" id="exportall">Esporta tutte</button></div>
+      <ul class="saved" id="saved"></ul>
+    </section>
+  </section>
+</div>
+<script>
+const DB = [["Pasta di semola (cruda)", "Cereali", 353, 12.5, 71, 3, 1.5, 0.3, 3, 22, 1.4], ["Pasta integrale (cruda)", "Cereali", 338, 13.4, 64, 3, 2.5, 0.4, 8, 35, 3], ["Riso bianco (crudo)", "Cereali", 334, 6.7, 80.4, 0.2, 0.4, 0.1, 1, 24, 0.8], ["Riso integrale (crudo)", "Cereali", 337, 7.5, 77, 0.8, 1.9, 0.4, 3.5, 23, 1.5], ["Farro (crudo)", "Cereali", 335, 15.1, 67.1, 1, 2.5, 0.4, 6.8, 43, 2.5], ["Quinoa (cruda)", "Cereali", 368, 14.1, 57, 0, 6.1, 0.7, 7, 47, 4.6], ["Fiocchi d'avena", "Cereali", 372, 13, 60, 1, 7, 1.2, 10, 52, 4.3], ["Pane comune", "Cereali", 275, 8.6, 58, 2.5, 0.5, 0.1, 3.1, 17, 0.7], ["Pane integrale", "Cereali", 243, 9, 46, 3, 1.6, 0.3, 6.5, 30, 2], ["Patate", "Tuberi", 85, 2.1, 18, 0.4, 0.1, 0, 1.6, 10, 0.6], ["Lenticchie secche", "Legumi", 325, 22.7, 51.1, 1.8, 2.5, 0.3, 13.8, 57, 8], ["Lenticchie al vapore", "Legumi", 130, 9.08, 20.44, 0.72, 1, 0.12, 5.52, 22.8, 3.2], ["Ceci secchi", "Legumi", 334, 20.9, 46.9, 2.6, 6.3, 0.6, 13.6, 142, 6.1], ["Fagioli borlotti secchi", "Legumi", 291, 20.2, 47.5, 2.5, 2, 0.3, 17.3, 102, 9], ["Ceci in scatola (sgocciolati)", "Legumi", 119, 6.7, 15, 0.5, 2.4, 0.3, 6, 40, 1.3], ["Fagioli in scatola (sgocciolati)", "Legumi", 90, 6, 12, 0.5, 0.5, 0.1, 6, 40, 1.5], ["Piselli surgelati", "Legumi", 71, 5.5, 9, 4, 0.4, 0.1, 5, 25, 1.5], ["Tofu (coagulato con calcio)", "Derivati soia", 120, 13, 1.5, 0.5, 7, 1, 1, 350, 2.5], ["Tempeh", "Derivati soia", 192, 20.3, 6, 0, 10.8, 2.2, 4, 111, 2.7], ["Seitan", "Proteici vegetali", 121, 22, 4, 0.5, 2, 0.3, 0.6, 40, 1.5], ["Bevanda di soia arricchita (no zuccheri)", "Bevande vegetali", 33, 3.3, 0.7, 0.3, 1.8, 0.3, 0.6, 120, 0.4], ["Uova intere", "Uova", 128, 12.4, 0, 0, 8.7, 3.2, 0, 48, 1.5], ["Latte parzialmente scremato", "Latte e derivati", 46, 3.5, 5, 5, 1.5, 1, 0, 120, 0.1], ["Yogurt bianco intero", "Latte e derivati", 66, 3.8, 4.3, 4.3, 3.9, 2.5, 0, 125, 0.1], ["Yogurt greco 0%", "Latte e derivati", 59, 10.2, 3.6, 3.2, 0.4, 0.1, 0, 110, 0.1], ["Fiocchi di latte", "Latte e derivati", 98, 11.1, 3.4, 2.7, 4.3, 1.7, 0, 83, 0.1], ["Ricotta vaccina", "Latte e derivati", 146, 8.8, 3.5, 3.5, 10.9, 7, 0, 295, 0.4], ["Mozzarella vaccina", "Latte e derivati", 253, 18.7, 0.7, 0.7, 19.5, 12, 0, 350, 0.2], ["Stracchino", "Latte e derivati", 300, 18.5, 0, 0, 25.1, 16, 0, 567, 0.3], ["Spinaci crudi", "Verdure", 31, 3.4, 2.9, 0.4, 0.7, 0.1, 1.9, 78, 2.9], ["Broccoli", "Verdure", 34, 2.8, 4, 1.7, 0.4, 0.1, 2.6, 47, 0.7], ["Cavolo nero", "Verdure", 42, 3.5, 3.5, 1, 0.9, 0.1, 3.6, 190, 1.5], ["Pomodori", "Verdure", 19, 1, 3.5, 3.5, 0.2, 0, 1, 11, 0.3], ["Zucchine", "Verdure", 17, 1.2, 2.2, 1.7, 0.3, 0.1, 1, 16, 0.4], ["Carote", "Verdure", 39, 1.1, 7.6, 7.6, 0.2, 0, 3.1, 44, 0.7], ["Peperoni rossi", "Verdure", 26, 0.9, 4.2, 4.2, 0.3, 0, 1.9, 17, 0.4], ["Lattuga", "Verdure", 19, 1.4, 2.2, 0.8, 0.2, 0, 1.5, 36, 0.9], ["Rucola", "Verdure", 25, 2.6, 2.1, 2, 0.7, 0.1, 1.6, 160, 1.5], ["Cime di rapa", "Verdure", 22, 2.9, 2, 0.4, 0.3, 0, 2.9, 97, 1.5], ["Cavolfiore", "Verdure", 25, 3.2, 2.7, 2.4, 0.2, 0, 2.4, 44, 0.6], ["Verza", "Verdure", 19, 2.1, 2.5, 2.3, 0.1, 0, 2.9, 35, 0.5], ["Cavolini di Bruxelles", "Verdure", 43, 4.2, 5.2, 2.2, 0.3, 0.1, 3.8, 42, 1.4], ["Finocchio", "Verdure", 13, 1.2, 1, 1, 0, 0, 2.2, 45, 0.2], ["Radicchio rosso", "Verdure", 13, 1.4, 1.6, 1.6, 0.1, 0, 3, 36, 0.3], ["Zucca gialla", "Verdure", 18, 1.1, 3.5, 2.5, 0.1, 0, 2, 20, 0.9], ["Carciofi", "Verdure", 33, 2.7, 2.5, 1, 0.2, 0, 5.5, 86, 1], ["Porri", "Verdure", 29, 2.1, 5.2, 3.9, 0.1, 0, 2.9, 59, 1.1], ["Bietola", "Verdure", 17, 1.3, 2.8, 1.1, 0.2, 0, 1.2, 70, 1.5], ["Asparagi", "Verdure", 29, 3.6, 3.3, 1.9, 0.2, 0, 2.1, 24, 0.7], ["Fave fresche", "Legumi", 41, 5.2, 4.5, 1, 0.4, 0.1, 5, 22, 1.5], ["Melanzane", "Verdure", 20, 1.1, 2.6, 2.6, 0.1, 0, 2.6, 14, 0.3], ["Fagiolini", "Verdure", 24, 2.1, 2.4, 2, 0.1, 0, 2.9, 35, 0.9], ["Cetrioli", "Verdure", 12, 0.7, 1.8, 1.8, 0.1, 0, 0.8, 16, 0.3], ["Cipolla", "Verdure", 26, 1, 5.7, 5.7, 0.1, 0, 1, 25, 0.4], ["Mela", "Frutta", 53, 0.3, 11.4, 10.4, 0.2, 0, 2.4, 6, 0.1], ["Banana", "Frutta", 91, 1.1, 20.2, 12.2, 0.3, 0.1, 2.6, 5, 0.3], ["Arancia", "Frutta", 47, 0.9, 9.4, 9.4, 0.1, 0, 2.4, 40, 0.1], ["Kiwi", "Frutta", 61, 1.1, 11.7, 9, 0.5, 0, 3, 34, 0.3], ["Fragole", "Frutta", 32, 0.7, 5.7, 4.9, 0.3, 0, 2, 16, 0.4], ["Mandarini", "Frutta", 53, 0.8, 11.5, 10.6, 0.3, 0, 1.8, 37, 0.2], ["Pompelmo", "Frutta", 29, 0.6, 6.2, 6.2, 0.1, 0, 1.6, 17, 0.1], ["Ciliegie", "Frutta", 38, 0.8, 9, 9, 0.1, 0, 1.3, 16, 0.4], ["Albicocche", "Frutta", 32, 0.4, 6.8, 6.8, 0.1, 0, 1.5, 16, 0.5], ["Pesche", "Frutta", 35, 0.8, 8, 8, 0.1, 0, 1.6, 6, 0.4], ["Susine", "Frutta", 46, 0.5, 10.5, 10.5, 0.1, 0, 1.5, 13, 0.2], ["Anguria", "Frutta", 17, 0.4, 3.7, 3.7, 0, 0, 0.2, 7, 0.2], ["Melone", "Frutta", 33, 0.8, 7.4, 7.4, 0.2, 0, 0.7, 9, 0.3], ["Fichi", "Frutta", 52, 0.9, 11.2, 11.2, 0.2, 0, 2, 43, 0.5], ["Mirtilli", "Frutta", 57, 0.7, 12.1, 10, 0.3, 0, 2.4, 6, 0.3], ["Uva", "Frutta", 64, 0.5, 15.6, 15.6, 0.1, 0, 1.5, 27, 0.4], ["Pere", "Frutta", 42, 0.3, 8.8, 8.8, 0.1, 0, 3.1, 6, 0.3], ["Cachi", "Frutta", 70, 0.6, 16, 16, 0.3, 0, 2.5, 8, 0.3], ["Melagrana", "Frutta", 80, 1.7, 14.7, 13.7, 1.2, 0.1, 4, 10, 0.3], ["Castagne fresche", "Frutta secca e semi", 180, 2.9, 36.7, 8.9, 1.7, 0.3, 4.7, 30, 0.9], ["Mandorle", "Frutta secca e semi", 595, 21.2, 9.1, 4.4, 49.9, 3.8, 12.5, 269, 3.7], ["Noci", "Frutta secca e semi", 689, 15.2, 7, 2.6, 65.2, 6.1, 6.7, 98, 2.9], ["Semi di zucca", "Frutta secca e semi", 593, 30.2, 4.7, 1.4, 49.1, 8.7, 6, 46, 8.8], ["Semi di lino", "Frutta secca e semi", 514, 18.3, 1.6, 1.6, 42.2, 3.7, 27.3, 255, 5.7], ["Tahina (crema di sesamo)", "Frutta secca e semi", 618, 17, 11.9, 0.5, 53.8, 7.5, 9.3, 426, 8.9], ["Burro di arachidi", "Frutta secca e semi", 610, 25, 12, 6, 50, 10, 6, 45, 1.9], ["Olio extravergine d'oliva", "Grassi", 899, 0, 0, 0, 99.9, 14.5, 0, 0, 0.6], ["Burro", "Grassi", 758, 0.8, 1.1, 1.1, 83.4, 51, 0, 24, 0.1], ["Manzo magro (crudo)", "Carne", 129, 21.3, 0, 0, 5, 2, 0, 4, 2], ["Petto di pollo (crudo)", "Carne", 100, 23.3, 0, 0, 0.8, 0.3, 0, 4, 0.4], ["Lonza di maiale (cruda)", "Carne", 146, 21, 0, 0, 6.8, 2.4, 0, 7, 0.8], ["Gelato alla crema / fior di latte", "Dolci e occasionali", 200, 3.5, 24, 21, 10, 6.5, 0.5, 120, 0.1], ["Gelato al cioccolato", "Dolci e occasionali", 230, 4, 26, 22, 12, 7.5, 1.5, 110, 0.9], ["Sorbetto / gelato alla frutta", "Dolci e occasionali", 130, 0.5, 31, 28, 0.2, 0, 0.5, 10, 0.2], ["Crostata di frutta / marmellata", "Dolci e occasionali", 380, 5.5, 60, 30, 13, 6.5, 1.8, 30, 1], ["Biscotti secchi", "Dolci e occasionali", 416, 6.6, 80, 22, 7.9, 2.5, 2.5, 30, 1.5], ["Cornetto / brioche", "Dolci e occasionali", 410, 7.5, 47, 15, 21, 11, 2, 30, 1], ["Pizza margherita", "Dolci e occasionali", 250, 10.5, 33, 2.5, 8, 3.5, 2, 180, 1.2], ["Cioccolato fondente 70%", "Altro", 572, 7.8, 34, 24, 42.6, 24.5, 10.9, 73, 11.9], ["Latte intero", "Latte e derivati", 64, 3.3, 4.9, 4.9, 3.6, 2.3, 0, 119, 0.1], ["Formaggino a caglio microbico (tipo Babybel)", "Latte e derivati", 306, 22, 0, 0, 24, 16, 0, 700, 0.2], ["Formaggio duro a caglio vegetale (tipo Gran Kinara)", "Latte e derivati", 390, 32, 0, 0, 28, 18, 0, 1100, 0.4], ["Crackers integrali", "Snack portatili", 430, 10, 65, 2, 13, 1.5, 7, 40, 2.5], ["Grissini", "Snack portatili", 410, 12, 70, 2.5, 9, 1.2, 3.5, 25, 1.4], ["Gallette di riso integrale", "Snack portatili", 380, 8, 78, 0.5, 3, 0.6, 4, 10, 1.5], ["Albicocche secche", "Snack portatili", 241, 3.4, 55, 53, 0.5, 0, 7.3, 55, 2.7], ["Fichi secchi", "Snack portatili", 249, 3.3, 54, 47.9, 0.9, 0.1, 9.8, 162, 2], ["Nocciole", "Frutta secca e semi", 628, 15, 7, 4.3, 60.8, 4.5, 9.7, 114, 4.7], ["Pistacchi (sgusciati)", "Frutta secca e semi", 560, 20, 16.6, 7.7, 45, 5.9, 10.6, 105, 3.9], ["Lenticchie rosse decorticate (secche)", "Legumi", 345, 24, 52, 2, 2.2, 0.3, 10.8, 48, 7.4], ["Cous cous (crudo)", "Cereali", 360, 12.8, 72.4, 0.5, 0.6, 0.1, 5, 24, 1.1], ["Orzo perlato (crudo)", "Cereali", 319, 10.4, 70.5, 0.8, 1.4, 0.3, 9.2, 29, 2.5], ["Passata di pomodoro", "Verdure", 21, 1.3, 3.5, 3.5, 0.2, 0, 1.5, 10, 0.9], ["Fette biscottate integrali", "Cereali", 410, 12, 70, 6, 7, 1.2, 9, 40, 2.5], ["Confettura extra di frutta", "Dolci e occasionali", 250, 0.4, 60, 55, 0.1, 0, 1, 15, 0.4], ["Miele", "Dolci e occasionali", 304, 0.3, 82, 82, 0, 0, 0.2, 6, 0.4], ["Cacao amaro in polvere", "Altro", 359, 19.6, 21, 1.8, 13.7, 8.1, 37, 128, 13.9], ["Semi di sesamo", "Frutta secca e semi", 573, 17.7, 11.7, 0.3, 49.7, 7, 11.8, 975, 14.6], ["Farina di ceci", "Legumi", 359, 22.4, 47, 10.9, 6.7, 0.7, 10.8, 45, 4.9], ["Farina di frumento tipo 0", "Cereali", 343, 11.5, 72, 1.7, 1, 0.2, 2.9, 17, 0.9], ["Farina integrale di frumento", "Cereali", 319, 12, 61, 2, 1.9, 0.3, 9, 28, 3], ["Pane grattugiato", "Cereali", 380, 12, 74, 4, 3.5, 0.8, 4, 40, 2]];
+const MODULES = {"Colazione": {"kcal": 433.8, "prot": 16, "Ca": 350, "Fe": 2.5, "sugCap": 33.5}, "Spuntino": {"kcal": 108.5, "sugCap": 11}, "Pranzo": {"kcal": 759.2, "prot": 28, "Ca": 250, "Fe": 6.5, "sugCap": 10}, "Merenda": {"kcal": 216.9, "prot": 8, "Ca": 200, "Fe": 1.2, "sugCap": 14}, "Cena": {"kcal": 650.8, "prot": 24, "Ca": 250, "Fe": 5.5, "sugCap": 12}, "Cena con carne": {"kcal": 650.8, "Ca": 250, "Fe": 5.5, "sugCap": 12}};
+const FOOD = new Map(DB.map(f=>[f[0].toLowerCase(),f]));
+const N = {kcal:0,prot:1,carb:2,sug:3,fat:4,sat:5,fib:6,Ca:7,Fe:8};
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const DEFAULT_MODEL="gemini-flash-latest", FALLBACK_MODEL="gemini-2.5-flash";
+let meal=LS.get("meal","Pranzo"), photos=[], busy=false, src="foto";
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{src=b.dataset.src;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("hidden",p.dataset.pane!==src));});
+
+function veg(){return $("#veg").checked;}
+function season(){const m=new Date().getMonth()+1;return m>=3&&m<=5?"P":m>=6&&m<=8?"E":m>=9&&m<=11?"A":"I";}
+// ---------- meals
+function renderMeals(){const box=$("#meals");box.innerHTML="";Object.keys(MODULES).forEach(k=>{const b=document.createElement("button");b.textContent=k;b.setAttribute("aria-pressed",String(meal===k));b.onclick=()=>{meal=k;LS.set("meal",k);$("#veg").checked=(k!=="Cena con carne");renderMeals();};box.appendChild(b);});}
+// ---------- setup
+function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);}}
+$("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
+$("#closesetup").onclick=()=>showSetup(false);
+$("#savekey").onclick=()=>{LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
+// ---------- photos
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
+    const max=1600,sc=Math.min(1,max/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    const data=c.toDataURL("image/jpeg",0.82);return {data:data.split(",")[1],preview:data};}
+  finally{URL.revokeObjectURL(url);}
+}
+async function addFiles(list){for(const f of list){try{photos.push(await shrink(f));}catch(e){}}renderThumbs();}
+$("#cam").onchange=e=>{addFiles(e.target.files);e.target.value="";};
+$("#lib").onchange=e=>{addFiles(e.target.files);e.target.value="";};
+function renderThumbs(){const t=$("#thumbs");t.innerHTML="";photos.forEach((p,i)=>{const d=document.createElement("div");d.className="thumb";d.innerHTML=`<img alt="Pagina ${i+1}" src="${p.preview}"><button aria-label="Togli pagina ${i+1}">×</button>`;d.querySelector("button").onclick=()=>{photos.splice(i,1);renderThumbs();};t.appendChild(d);});}
+
+// ---------- Gemini
+function promptText(){
+  const allowed=DB.map(f=>f[0]).join("\n");
+  return `Leggi la ricetta (dalle foto, anche su più pagine, e/o dal testo) e restituisci SOLO il JSON richiesto.
+Contesto: la ricetta sarà riproporzionata per una ragazza di 15 anni, vegetariana con latte e uova, che mangia carne una volta a settimana. Pasto scelto: "${meal}".
+Se il testo è solo un'idea o una descrizione senza dosi (es. "pasta e piselli come la fa la nonna"), crea tu una ricetta semplice, tradizionale e plausibile, con dosi per 2 persone.
+Regole:
+- Per ogni ingrediente indica "alimento": il nome ESATTO dell'alimento più simile dall'elenco qui sotto (anche se approssimativo), e "grammi": il peso crudo/edibile per TUTTA la ricetta (converti: 1 uovo = 50 g, 1 cucchiaio d'olio = 10 g, 1 cucchiaino = 5 g, 1 bicchiere = 200 ml = 200 g, 1 tazza = 250 g; latte e liquidi in grammi = ml).
+- "nome" è come l'ingrediente va chiamato nella ricetta (es. "zucchine", "farina 00").
+- Segna "trascurabile": true per sale, pepe, spezie, erbe, aglio, scorza o succo di limone, aceto, lievito, brodo, acqua e quantità minime: non serve l'alimento.
+- Ingredienti NON ammessi da sostituire con un'alternativa simile e semplice: funghi, avocado, mango, pesce e frutti di mare, Parmigiano, Grana, pecorino, gorgonzola, fontina, provolone, feta, mozzarella di bufala (usa "Formaggio duro a caglio vegetale (tipo Gran Kinara)" o "Mozzarella vaccina" o "Ricotta vaccina"). ${veg()?"Versione latto-ovo-vegetariana: sostituisci carne, salumi, pesce, frutti di mare, brodo di carne, strutto e gelatina animale con alternative vegetariane semplici (legumi, uova, formaggi ammessi, tofu, brodo vegetale) mantenendo il carattere del piatto.":"La carne è ammessa (manzo, pollo, maiale); salumi e pesce vanno sostituiti."} Elenca ogni cambio in "sostituzioni" con frasi brevi (es. "Parmigiano → formaggio a caglio vegetale").
+- "porzioni": per quante persone è la ricetta originale (se non è scritto, stimalo).
+- "da_dividere": true se è una preparazione che si fa comunque intera e poi si divide (torte, crostate, plumcake, biscotti, muffin, pane, focacce, pizze in teglia, lasagne o sformati al forno); in quel caso "unita" è come si divide al plurale ("fette", "biscotti", "quadrotti") e il procedimento resta per la ricetta intera.
+- "procedimento": passi brevi e chiari per preparare UNA porzione (o la ricetta intera se da_dividere), con parole semplici per una ragazza che cucina da sola. NON scrivere quantità né grammi (scrivi "aggiungi la farina", non "aggiungi 200 g di farina"); tempi e temperature vanno bene. Usa gli ingredienti sostituiti.
+- "titolo": nome della ricetta in italiano. Se il testo non è una ricetta, metti "non_ricetta": true.
+Elenco alimenti:
+${allowed}`;
+}
+const SCHEMA={type:"OBJECT",properties:{
+  non_ricetta:{type:"BOOLEAN"},titolo:{type:"STRING"},porzioni:{type:"NUMBER"},da_dividere:{type:"BOOLEAN"},unita:{type:"STRING"},
+  ingredienti:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"},trascurabile:{type:"BOOLEAN"}},required:["nome","grammi","trascurabile"]}},
+  sostituzioni:{type:"ARRAY",items:{type:"STRING"}},procedimento:{type:"ARRAY",items:{type:"STRING"}},tempo:{type:"STRING"}},
+  required:["titolo","porzioni","ingredienti","procedimento"]};
+async function gemini(parts,opt={}){
+  const key=LS.get("key",""); if(!key){showSetup(true);throw {friendly:"Prima serve la chiave: chiedi ai tuoi genitori di inserirla."};}
+  const body=opt.plain?{contents:[{role:"user",parts}],tools:opt.tools||undefined,generationConfig:{temperature:0.1}}
+                      :{contents:[{role:"user",parts}],generationConfig:{temperature:0.2,responseMimeType:"application/json",responseSchema:SCHEMA}};
+  let model=LS.get("model",DEFAULT_MODEL);
+  for(let attempt=0;attempt<2;attempt++){
+    let r;
+    try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)}); }
+    catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova."}; }
+    if(r.status===404&&model!==FALLBACK_MODEL){model=FALLBACK_MODEL;continue;}
+    if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto."};
+    if(r.status===400||r.status===401||r.status===403){ let m=""; try{m=(await r.json()).error.message||"";}catch(e){} if(opt.plain&&opt.tools&&!/key/i.test(m)) throw {toolfail:true}; throw {friendly:/key|API key|permission/i.test(m)?"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).":"La richiesta non è andata a buon fine: riprova con foto più nitide o con il testo."}; }
+    if(!r.ok) throw {friendly:"Il servizio non risponde ora: riprova tra poco."};
+    const j=await r.json();
+    const txt=j?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("")||"";
+    if(opt.plain) return txt;
+    try{return JSON.parse(txt.replace(/^```json|```$/g,"").trim());}catch(e){throw {friendly:"Non sono riuscita a leggere bene la ricetta: prova con foto più nitide o incolla il testo."};}
+  }
+}
+
+// ---------- web page
+async function pageText(url){
+  try{ const t=await gemini([{text:"Apri questa pagina e riporta SOLO il testo completo della ricetta che contiene (titolo, porzioni, ingredienti con quantità, procedimento), senza commenti. Se non c'è una ricetta scrivi soltanto NESSUNA RICETTA.\n"+url}],{plain:true,tools:[{url_context:{}}]});
+       if(t&&t.trim().length>40) return t; }
+  catch(e){ if(e&&e.friendly&&!e.toolfail) throw e; }
+  try{ const r=await fetch("https://r.jina.ai/"+url); if(r.ok){ const t=await r.text(); if(t.trim().length>40) return t.slice(0,40000); } }catch(e){}
+  throw {friendly:"Non riesco ad aprire questa pagina: copia il testo della ricetta e incollalo nella scheda Testo."};
+}
+// ---------- calculations (hidden)
+function nut(items){const t=Object.fromEntries(Object.keys(N).map(k=>[k,0]));for(const [f,g] of items){const r=FOOD.get(String(f).toLowerCase());if(!r)continue;for(const k in N)t[k]+=r[2+N[k]]*g/100;}return t;}
+function vitCfruit(){const s=season();return {P:{items:[["Fragole",150]],txt:"una ciotola di fragole"},E:{items:[["Melone",200]],txt:"una fetta di melone"},A:{items:[["Kiwi",100]],txt:"1 kiwi"},I:{items:[["Arancia",150]],txt:"1 arancia"}}[s];}
+function accList(m){
+  const fr=vitCfruit();
+  const A={
+    pane:{items:[["Pane integrale",50]],txt:"1 fetta di pane integrale"},
+    yogurt:{items:[["Yogurt bianco intero",125]],txt:"1 vasetto di yogurt bianco"},
+    latte:{items:[["Latte parzialmente scremato",200]],txt:"1 tazza di latte"},
+    formaggino:{items:[["Formaggino a caglio microbico (tipo Babybel)",20]],txt:"1 formaggino"},
+    frutto:{items:fr.items,txt:fr.txt},
+    mandorle:{items:[["Mandorle",15]],txt:"una manciata di mandorle"},
+    semi:{items:[["Semi di zucca",10]],txt:"un cucchiaio di semi di zucca sul piatto"},
+    rucola:{items:[["Rucola",60],["Olio extravergine d'oliva",5]],txt:"un piatto di rucola con un filo d'olio"}};
+  const by={"Colazione":["latte","yogurt","pane","frutto","mandorle"],"Spuntino":["frutto","mandorle","formaggino"],"Pranzo":["pane","rucola","semi","frutto","yogurt","formaggino"],"Merenda":["yogurt","latte","pane","frutto","mandorle"],"Cena":["pane","rucola","semi","frutto","yogurt","formaggino"],"Cena con carne":["pane","rucola","frutto","yogurt","formaggino"]};
+  return by[m].map(k=>({id:k,...A[k],n:nut(A[k].items)}));
+}
+function plan(rec){
+  const T=MODULES[meal];
+  const core=rec.ingredienti.filter(i=>!i.trascurabile&&i.alimento&&FOOD.has(String(i.alimento).toLowerCase())&&i.grammi>0);
+  const por=Math.max(1,Number(rec.porzioni)||1);
+  const base=nut(core.map(i=>[i.alimento,i.grammi/por]));
+  if(base.kcal<5) return null;
+  const div=!!rec.da_dividere;
+  const lo=0.4, hi=div?3:1.4;
+  const keys=["prot","Ca","Fe"].filter(k=>T[k]);
+  const pool=accList(meal); let chosen=[];
+  const scaleFor=accK=>Math.min(hi,Math.max(lo,(T.kcal-accK)/base.kcal));
+  const kc=acc=>acc.reduce((a,x)=>a+x.n.kcal,0);
+  const total=(acc)=>{const s=scaleFor(kc(acc));const t={};for(const k in N)t[k]=base[k]*s+acc.reduce((a,x)=>a+x.n[k],0);return t;};
+  const deficit=t=>keys.reduce((a,k)=>a+Math.max(0,0.9*T[k]-t[k])/T[k],0);
+  for(let round=0;round<2;round++){
+    const cur=total(chosen); const d=deficit(cur); if(d<0.08) break;
+    let best=null,bestGain=0;
+    for(const a of pool){ if(chosen.includes(a)) continue;
+      if((T.kcal-kc([...chosen,a]))/base.kcal<0.55) continue;
+      if(a.id==="frutto"&&cur.sug+a.n.sug>T.sugCap) continue;
+      const gain=d-deficit(total([...chosen,a]));
+      if(gain>bestGain+0.02){bestGain=gain;best=a;} }
+    if(!best) break; chosen.push(best);
+  }
+  // energy still short (light recipe): add simple foods instead of making the dish huge
+  const fillers=meal==="Spuntino"?["frutto","mandorle"]:meal==="Colazione"||meal==="Merenda"?["pane","frutto","yogurt","latte"]:["pane","pane2","frutto","yogurt"];
+  for(const id of fillers){
+    if(total(chosen).kcal>=T.kcal*0.9||chosen.length>=4) break;
+    if(id==="pane2"){const i=chosen.findIndex(a=>a.id==="pane"); if(i>=0){const p2={id:"pane2",items:[["Pane integrale",100]],txt:"2 fette di pane integrale"};p2.n=nut(p2.items);chosen[i]=p2;} continue;}
+    const a=pool.find(x=>x.id===id); if(!a||chosen.find(x=>x.id===id)) continue;
+    if(id==="frutto"&&total(chosen).sug+a.n.sug>T.sugCap) continue;
+    chosen.push(a);
+  }
+  const s=scaleFor(kc(chosen)); const t=total(chosen);
+  const slices=div?Math.max(1,Math.min(24,Math.round(por/s))):null;
+  return {scale:s/por, div, slices, unit:rec.unita||"fette", acc:chosen, rich:t.sug>T.sugCap*1.3, check:t};
+}
+// friendly quantities
+function qty(i,f){
+  const g=i.grammi*f, name=i.nome, low=String(i.alimento||"").toLowerCase();
+  if(low.startsWith("uova")){ if(g<35) return "mezzo uovo sbattuto"; const n=Math.max(1,Math.round(g/50*2)/2); const w=Math.floor(n),h=n%1?" e mezzo":""; return n===1?"1 uovo":`${w} uov${w===1?"o":"a"}${h}`; }
+  if(low.startsWith("formaggino")){const n=Math.max(1,Math.round(g/20));return `${n} formaggin${n>1?"i":"o"}`;}
+  if(low.startsWith("olio")){const c=Math.max(0.5,Math.round(g/10*2)/2); const w=Math.floor(c),h=c%1; const t=w===0?"mezzo cucchiaio":`${w} cucchiai${w===1?"o":""}${h?" e mezzo":""}`; return `${t} di ${name}`;}
+  const r=g>=20?Math.round(g/5)*5:Math.max(1,Math.round(g));
+  const ml=/latte|bevanda|panna|brodo|acqua/i.test(name)||/^latte|^bevanda/.test(low);
+  return `${r} ${ml?"ml":"g"} di ${name}`;
+}
+// ---------- run
+$("#go").onclick=async()=>{
+  if(busy) return; $("#err").classList.add("hidden");
+  const text=$("#text").value.trim(), url=$("#url").value.trim();
+  if(src==="foto"&&!photos.length){showErr("Fotografa la ricetta o scegli una foto dalla galleria.");return;}
+  if(src==="testo"&&!text){showErr("Incolla la ricetta o scrivi un'idea di piatto.");return;}
+  if(src==="link"&&!/^https?:\/\/\S+\.\S+/.test(url)){showErr("Incolla un indirizzo completo, che inizi con https://");return;}
+  busy=true;$("#go").disabled=true;$("#result").classList.add("hidden");
+  const steps=["Leggo la ricetta…","Preparo la tua porzione…","Ci siamo quasi…"];let si=0;$("#status").textContent=steps[0];
+  const tick=setInterval(()=>{si=Math.min(si+1,steps.length-1);$("#status").textContent=steps[si];},6000);
+  try{
+    const parts=[{text:promptText()}];
+    if(src==="foto") photos.forEach(p=>parts.push({inline_data:{mime_type:"image/jpeg",data:p.data}}));
+    if(src==="testo") parts.push({text:"Testo:\n"+text});
+    if(src==="link"){ const t=await pageText(url); if(/NESSUNA RICETTA/.test(t)&&t.length<200) throw {friendly:"In questa pagina non ho trovato una ricetta."}; parts.push({text:"Testo della ricetta (da "+url+"):\n"+t}); $("#status").textContent="Preparo la tua porzione…"; }
+    const rec=await gemini(parts);
+    if(rec.non_ricetta||!Array.isArray(rec.ingredienti)||!rec.ingredienti.length) throw {friendly:"Non ho trovato una ricetta: prova con un'altra foto, un altro testo o un'altra pagina."};
+    const p=plan(rec); if(!p) throw {friendly:"Non riesco a riconoscere gli ingredienti: prova a incollare il testo."};
+    const view=buildView(rec,p); showResult(view,true);
+  }catch(e){ showErr(e&&e.friendly?e.friendly:"Qualcosa non ha funzionato: riprova."); }
+  finally{clearInterval(tick);busy=false;$("#go").disabled=false;$("#status").textContent="";}
+};
+function showErr(t){const e=$("#err");e.textContent=t;e.classList.remove("hidden");}
+function buildView(rec,p){
+  const f=p.div?1:p.scale;
+  const ing=rec.ingredienti.map(i=> i.trascurabile? `${i.nome}: quanto basta` : (i.alimento&&FOOD.has(String(i.alimento).toLowerCase())? qty(i,f) : `${i.nome}: poco, come nella ricetta`));
+  const portion=p.div?`Prepara la ricetta intera e dividila in ${p.slices} ${p.slices===1?"porzione":(p.unit||"fette")} uguali: la tua porzione è ${p.slices===1?"tutta":"una"}. Il resto si conserva o si condivide.`:"";
+  return {titolo:rec.titolo,pasto:meal,veg:veg(),fonte:src==="link"?$("#url").value.trim():"",tempo:rec.tempo||"",ing,portion,steps:rec.procedimento||[],sost:rec.sostituzioni||[],acc:p.acc.map(a=>a.txt),rich:p.rich,date:Date.now()};
+}
+function esc(s){const d=document.createElement("div");d.textContent=String(s);return d.innerHTML;}
+function showResult(v,fresh){
+  const r=$("#result");
+  r.innerHTML=`<div class="card"><h3>${esc(v.titolo)}</h3><p class="sub">La tua porzione per: ${esc(v.pasto.toLowerCase())}${v.tempo?` · ${esc(v.tempo)}`:""}</p>
+  <h4>${v.portion?"Ingredienti (ricetta intera)":"Ingredienti"}</h4><ul>${v.ing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  ${v.portion?`<p class="note" style="color:var(--ink)"><b>La tua porzione:</b> ${esc(v.portion)}</p>`:""}
+  ${v.acc.length?`<div class="together"><h4>Da mangiare insieme</h4><ul>${v.acc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+  <h4>Come si fa</h4><ol>${v.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+  ${v.sost.length?`<p class="note">Ho cambiato: ${v.sost.map(esc).join("; ")}.</p>`:""}
+  ${v.rich?`<p class="note">È una ricetta golosa: perfetta ogni tanto.</p>`:""}
+  ${v.fonte?`<p class="note">Fonte: ${esc(v.fonte)}</p>`:""}
+  <div class="big" style="margin:14px 0 10px">${fresh?`<button class="btn grow" id="save">Salva</button>`:""}<button class="btn ghost grow" id="share">Condividi</button><button class="btn ghost grow" id="again">Nuova ricetta</button></div></div>`;
+  r.classList.remove("hidden"); r.scrollIntoView({behavior:"smooth",block:"start"});
+  if(fresh) $("#save").onclick=()=>{const s=LS.get("saved",[]);s.unshift(v);LS.set("saved",s.slice(0,40));$("#save").textContent="Salvata";$("#save").disabled=true;renderSaved();};
+  $("#share").onclick=()=>shareText(v.titolo,plain(v),$("#share"));
+  $("#again").onclick=()=>{photos=[];renderThumbs();$("#text").value="";$("#url").value="";r.classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"});};
+}
+function plain(v){
+  return [v.titolo, `Per: ${v.pasto.toLowerCase()}${v.tempo?" - "+v.tempo:""}`, "",
+    v.portion?"Ingredienti (ricetta intera):":"Ingredienti:", ...v.ing.map(x=>"- "+x),
+    ...(v.portion?["","La tua porzione: "+v.portion]:[]),
+    ...(v.acc&&v.acc.length?["","Da mangiare insieme:",...v.acc.map(x=>"- "+x)]:[]),
+    "","Come si fa:", ...v.steps.map((x,i)=>`${i+1}. ${x}`),
+    ...(v.sost&&v.sost.length?["","Ho cambiato: "+v.sost.join("; ")]:[]),
+    ...(v.fonte?["","Fonte: "+v.fonte]:[])].join("\n");
+}
+async function shareText(title,text,btn){
+  try{ if(navigator.share){ await navigator.share({title,text}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
+  try{ await navigator.clipboard.writeText(text); flash(btn,"Copiata"); }catch(e){ flash(btn,"Non riuscito"); }
+}
+function flash(btn,t){ if(!btn) return; const o=btn.textContent; btn.textContent=t; setTimeout(()=>btn.textContent=o,1600); }
+function htmlBook(list){
+  const card=v=>`<section><h2>${esc(v.titolo)}</h2><p class="m">Per: ${esc(v.pasto.toLowerCase())}${v.tempo?" · "+esc(v.tempo):""}</p>
+  <h3>${v.portion?"Ingredienti (ricetta intera)":"Ingredienti"}</h3><ul>${v.ing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  ${v.portion?`<p><b>La tua porzione:</b> ${esc(v.portion)}</p>`:""}
+  ${v.acc&&v.acc.length?`<div class="t"><h3>Da mangiare insieme</h3><ul>${v.acc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+  <h3>Come si fa</h3><ol>${v.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+  ${v.sost&&v.sost.length?`<p class="m">Ho cambiato: ${v.sost.map(esc).join("; ")}.</p>`:""}${v.fonte?`<p class="m">Fonte: ${esc(v.fonte)}</p>`:""}</section>`;
+  return `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Le mie ricette</title>
+<style>body{font-family:Calibri,-apple-system,"Segoe UI",sans-serif;max-width:680px;margin:0 auto;padding:24px;color:#1D2A22;line-height:1.5}h1{color:#2E5E3E}h2{color:#2E5E3E;margin-bottom:2px}h3{font-size:16px;margin:14px 0 4px}.m{color:#5F6D64;font-size:15px}.t{background:#E3EEE5;border-radius:12px;padding:6px 14px}section{border-top:1px solid #D7E0D8;padding-top:10px;margin-top:24px;page-break-inside:avoid}</style></head>
+<body><h1>Le mie ricette</h1><p class="m">${list.length} ricett${list.length===1?"a":"e"} · esportate il ${new Date().toLocaleDateString("it-IT")}</p>${list.map(card).join("")}</body></html>`;
+}
+async function exportAll(btn){
+  const list=LS.get("saved",[]); if(!list.length) return;
+  const name="Le mie ricette.html"; const blob=new Blob([htmlBook(list)],{type:"text/html"});
+  try{ const file=new File([blob],name,{type:"text/html"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"Le mie ricette"}); return; } }
+  catch(e){ if(e&&e.name==="AbortError") return; }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000); flash(btn,"Esportate");
+}
+$("#exportall").onclick=()=>exportAll($("#exportall"));
+function renderSaved(){
+  const s=LS.get("saved",[]);$("#savedbox").classList.toggle("hidden",!s.length);const ul=$("#saved");ul.innerHTML="";
+  s.forEach((v,i)=>{const li=document.createElement("li");li.innerHTML=`<button class="open">${esc(v.titolo)} <span style="color:var(--muted)">· ${esc(v.pasto.toLowerCase())}</span></button><button class="del" aria-label="Elimina">×</button>`;
+    li.querySelector(".open").onclick=()=>showResult(v,false);
+    li.querySelector(".del").onclick=()=>{const a=LS.get("saved",[]);a.splice(i,1);LS.set("saved",a);renderSaved();};ul.appendChild(li);});
+}
+$("#veg").checked=(meal!=="Cena con carne");
+renderMeals(); renderSaved(); if(!LS.get("key","")) showSetup(true);
+</script>
+</body>
+</html>
