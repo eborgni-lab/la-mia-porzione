@@ -90,7 +90,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione<span class="ver">v5</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v6</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
@@ -102,7 +102,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
     <button class="btn ghost" id="testkey" type="button" style="width:100%;margin-bottom:10px">Prova la connessione</button>
     <div id="testout" class="datanote" aria-live="polite"></div>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
-    <p class="datanote">Versione 5. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
+    <p class="datanote">Versione 6. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
   <section id="main">
@@ -209,6 +209,7 @@ Se il testo è solo un'idea o una descrizione senza dosi (es. "pasta e piselli c
 Regole:
 - Per ogni ingrediente indica "alimento": il nome ESATTO dell'alimento più simile dall'elenco qui sotto (anche se approssimativo), e "grammi": il peso crudo/edibile per TUTTA la ricetta (converti: 1 uovo = 50 g, 1 cucchiaio d'olio = 10 g, 1 cucchiaino = 5 g, 1 bicchiere = 200 ml = 200 g, 1 tazza = 250 g; latte e liquidi in grammi = ml).
 - "nome" è come l'ingrediente va chiamato nella ricetta (es. "zucchine", "farina 00").
+- Per gli ingredienti trascurabili scrivi in "quantita_testo" la quantità per UNA porzione in parole semplici (es. "1 spicchio", "2 foglie", "un pizzico", "a piacere").
 - Segna "trascurabile": true per sale, pepe, spezie, erbe, aglio, scorza o succo di limone, aceto, lievito, brodo, acqua e quantità minime: non serve l'alimento.
 - Ingredienti NON ammessi da sostituire con un'alternativa simile e semplice: funghi, avocado, mango, pesce e frutti di mare, Parmigiano, Grana, pecorino, gorgonzola, fontina, provolone, feta, mozzarella di bufala (usa "Formaggio duro a caglio vegetale (tipo Gran Kinara)" o "Mozzarella vaccina" o "Ricotta vaccina"). ${veg()?"Versione latto-ovo-vegetariana: sostituisci carne, salumi, pesce, frutti di mare, brodo di carne, strutto e gelatina animale con alternative vegetariane semplici (legumi, uova, formaggi ammessi, tofu, brodo vegetale) mantenendo il carattere del piatto.":"La carne è ammessa (manzo, pollo, maiale); salumi e pesce vanno sostituiti."} Elenca ogni cambio in "sostituzioni" con frasi brevi (es. "Parmigiano → formaggio a caglio vegetale").
 - "porzioni": per quante persone è la ricetta originale (se non è scritto, stimalo).
@@ -221,7 +222,7 @@ ${allowed}`;
 }
 const SCHEMA={type:"OBJECT",properties:{
   non_ricetta:{type:"BOOLEAN"},titolo:{type:"STRING"},porzioni:{type:"NUMBER"},da_dividere:{type:"BOOLEAN"},unita:{type:"STRING"},
-  ingredienti:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"},trascurabile:{type:"BOOLEAN"}},required:["nome","grammi","trascurabile"]}},
+  ingredienti:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"},trascurabile:{type:"BOOLEAN"},quantita_testo:{type:"STRING"}},required:["nome","grammi","trascurabile"]}},
   sostituzioni:{type:"ARRAY",items:{type:"STRING"}},extra:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"}},required:["nome","grammi"]}},procedimento:{type:"ARRAY",items:{type:"STRING"}},tempo:{type:"STRING"}},
   required:["titolo","porzioni","ingredienti","procedimento"]};
 // scelta automatica del modello: cerca tra i modelli disponibili per questa chiave
@@ -292,6 +293,7 @@ async function pageText(url){
 }
 // ---------- calculations (hidden)
 function nut(items){const t=Object.fromEntries(Object.keys(N).map(k=>[k,0]));for(const [f,g] of items){const r=FOOD.get(String(f).toLowerCase());if(!r)continue;for(const k in N)t[k]+=r[2+N[k]]*g/100;}return t;}
+function contorno(){const s=season();return {P:{items:[["Lattuga",100],["Olio extravergine d'oliva",5]],txt:"un'insalata di lattuga con un filo d'olio"},E:{items:[["Pomodori",150],["Olio extravergine d'oliva",5]],txt:"un piatto di pomodori con un filo d'olio"},A:{items:[["Broccoli",150],["Olio extravergine d'oliva",5]],txt:"un piatto di broccoli al vapore con un filo d'olio"},I:{items:[["Finocchio",150],["Olio extravergine d'oliva",5]],txt:"un finocchio in insalata con un filo d'olio"}}[s];}
 function vitCfruit(){const s=season();return {P:{items:[["Fragole",150]],txt:"una ciotola di fragole"},E:{items:[["Melone",200]],txt:"una fetta di melone"},A:{items:[["Kiwi",100]],txt:"1 kiwi"},I:{items:[["Arancia",150]],txt:"1 arancia"}}[s];}
 function accList(m){
   const fr=vitCfruit();
@@ -314,10 +316,14 @@ function plan(rec){
   const base=nut(core.map(i=>[i.alimento,i.grammi/por]));
   if(base.kcal<5) return null;
   const div=!!rec.da_dividere;
-  const lo=0.4, hi=div?3:1.25;
+  const lo=0.4, hi=div?3:1.1;
   const keys=["prot","Ca","Fe"].filter(k=>T[k]);
   const pool=accList(meal); let chosen=[];
+  const vegG=core.filter(i=>{const f=FOOD.get(String(i.alimento).toLowerCase());return f&&f[1]==="Verdure"&&!/passata/i.test(f[0]);}).reduce((a,i)=>a+i.grammi/por,0);
+  const needVeg=["Pranzo","Cena","Cena con carne"].includes(meal)&&!rec.da_dividere;
   const fixed=(rec.extra||[]).filter(e=>e&&e.alimento&&FOOD.has(String(e.alimento).toLowerCase())&&e.grammi>0).map(e=>{const a={id:"extra",items:[[e.alimento,e.grammi]],txt:`${e.nome} (come hai scritto tu)`};a.n=nut(a.items);return a;});
+  if(needVeg&&vegG<80){const c=contorno();const a={id:"contorno",items:c.items,txt:c.txt};a.n=nut(a.items);fixed.push(a);}
+  const hasVeg=fixed.some(a=>a.id==="contorno")||vegG>=80;
   const scaleFor=accK=>Math.min(hi,Math.max(lo,(T.kcal-accK)/base.kcal));
   const kc=acc=>acc.concat(fixed).reduce((a,x)=>a+x.n.kcal,0);
   const total=(acc)=>{const s=scaleFor(kc(acc));const t={};for(const k in N)t[k]=base[k]*s+acc.concat(fixed).reduce((a,x)=>a+x.n[k],0);return t;};
@@ -325,7 +331,7 @@ function plan(rec){
   for(let round=0;round<1;round++){
     const cur=total(chosen); const d=deficit(cur); if(d<0.08) break;
     let best=null,bestGain=0;
-    for(const a of pool){ if(chosen.includes(a)) continue;
+    for(const a of pool){ if(chosen.includes(a)) continue; if(a.id==="rucola"&&hasVeg) continue;
       if((T.kcal-kc([...chosen,a]))/base.kcal<0.55) continue;
       if(a.id==="frutto"&&cur.sug+a.n.sug>T.sugCap) continue;
       const gain=d-deficit(total([...chosen,a]));
@@ -381,7 +387,7 @@ $("#go").onclick=async()=>{
 function showErr(t,detail){const e=$("#err");e.innerHTML=esc(t)+(detail?`<details style="margin-top:6px;font-size:13px"><summary>Dettagli tecnici</summary>${esc(detail)}</details>`:"");e.classList.remove("hidden");}
 function buildView(rec,p){
   const f=p.div?1:p.scale;
-  const ing=rec.ingredienti.map(i=> i.trascurabile? `${i.nome}: quanto basta` : (i.alimento&&FOOD.has(String(i.alimento).toLowerCase())? qty(i,f) : `${i.nome}: poco, come nella ricetta`));
+  const ing=rec.ingredienti.map(i=> i.trascurabile? `${i.nome}: ${(i.quantita_testo&&!/^q\.?b\.?$/i.test(i.quantita_testo.trim()))?i.quantita_testo:"quanto basta"}` : (i.alimento&&FOOD.has(String(i.alimento).toLowerCase())? qty(i,f) : `${i.nome}: poco, come nella ricetta`));
   const portion=p.div?`Prepara la ricetta intera e dividila in ${p.slices} ${p.slices===1?"porzione":(p.unit||"fette")} uguali: la tua porzione è ${p.slices===1?"tutta":"una"}. Il resto si conserva o si condivide.`:"";
   return {titolo:rec.titolo,pasto:meal,veg:veg(),fonte:src==="link"?$("#url").value.trim():"",tempo:rec.tempo||"",ing,portion,steps:rec.procedimento||[],sost:rec.sostituzioni||[],acc:p.acc.map(a=>a.txt),rich:p.rich,date:Date.now()};
 }

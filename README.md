@@ -36,6 +36,12 @@ In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apr
 - Il piano gratuito di Gemini usa i dati inviati per migliorare i prodotti Google: non fotografare documenti con dati personali.
 - Modello: con «auto» (consigliato) l'app chiede a Google quali modelli sono disponibili per la chiave e usa il Flash stabile più recente. Se un modello viene ritirato, passa da sola al successivo.
 
+## Composizione del piatto
+
+- A pranzo e a cena, se la ricetta contiene poca verdura, l'app aggiunge sempre un contorno di stagione (insalata, pomodori, broccoli o finocchi) prima di altri accompagnamenti.
+- La porzione del piatto principale non viene ingrandita più del 10%: l'energia mancante arriva da contorno, pane, frutta o yogurt.
+- Gli ingredienti minori (aglio, erbe, spezie) mantengono la quantità indicata nella ricetta.
+
 ## Velocità
 
 - L'app chiede a Gemini di ragionare poco (livello di "pensiero" basso), che riduce molto i tempi di risposta.
