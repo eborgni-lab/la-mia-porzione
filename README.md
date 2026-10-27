@@ -36,6 +36,12 @@ In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apr
 - Il piano gratuito di Gemini usa i dati inviati per migliorare i prodotti Google: non fotografare documenti con dati personali.
 - Modello: con «auto» (consigliato) l'app chiede a Google quali modelli sono disponibili per la chiave e usa il Flash stabile più recente. Se un modello viene ritirato, passa da sola al successivo.
 
+## Velocità
+
+- L'app chiede a Gemini di ragionare poco (livello di "pensiero" basso), che riduce molto i tempi di risposta.
+- Nella rotellina: **Modalità veloce** usa il modello Flash-Lite, ancora più rapido ma un po' meno preciso con le foto.
+- Sempre nella rotellina compare la durata dell'ultima richiesta e il modello usato.
+
 ## Se qualcosa non funziona
 
 1. Rotellina in alto → **Prova la connessione**: dice se la chiave è valida e quale modello verrà usato.

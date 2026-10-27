@@ -90,7 +90,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione<span class="ver">v4</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v5</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
@@ -98,10 +98,11 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
     <p><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Crea la chiave su Google AI Studio</a></p>
     <input type="password" id="key" placeholder="Chiave Gemini" autocomplete="off" autocapitalize="off" spellcheck="false">
     <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label><small style="display:block;color:var(--muted);margin-top:4px">Lascia «auto»: l'app sceglie da sola il modello Flash più recente disponibile.</small></p>
+    <p><label><input type="checkbox" id="fast"> Modalità veloce (modello Flash-Lite: più rapido, un po' meno preciso nel leggere le foto)</label></p>
     <button class="btn ghost" id="testkey" type="button" style="width:100%;margin-bottom:10px">Prova la connessione</button>
     <div id="testout" class="datanote" aria-live="polite"></div>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
-    <p class="datanote">Versione 4. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
+    <p class="datanote">Versione 5. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
   <section id="main">
@@ -171,7 +172,7 @@ function season(){const m=new Date().getMonth()+1;return m>=3&&m<=5?"P":m>=6&&m<
 const ICONS={"Colazione":"🥣","Spuntino":"🍎","Pranzo":"🍝","Merenda":"🥪","Cena":"🍲","Cena con carne":"🍗"};
 function renderMeals(){const box=$("#meals");box.innerHTML="";$("#mealname").textContent=meal;Object.keys(MODULES).forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=ICONS[k]||k;b.title=k;b.setAttribute("aria-label",k);b.setAttribute("aria-pressed",String(meal===k));b.onclick=()=>{meal=k;LS.set("meal",k);$("#veg").checked=(k!=="Cena con carne");renderMeals();};box.appendChild(b);});}
 // ---------- setup
-function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);}}
+function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);$("#fast").checked=!!LS.get("fast",false);const lr=LS.get("lastRun",null);$("#testout").textContent=lr?`Ultima richiesta: ${lr.sec} secondi con ${lr.model} (${lr.when}).`:"";}}
 $("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
 $("#closesetup").onclick=()=>showSetup(false);
 $("#testkey").onclick=async()=>{
@@ -183,15 +184,15 @@ $("#testkey").onclick=async()=>{
        out.innerHTML=`Chiave valida: ${names.length} modelli disponibili.<br>Modello che verrà usato: <b>${esc(m||"nessuno")}</b>${ok?"":" (non presente nell'elenco!)"}`; }
   catch(e){ out.textContent=`Errore ${e.status||""}: ${e.detail||"impossibile collegarsi"}`; }
 };
-$("#savekey").onclick=()=>{LS.set("autoModel",null);LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
+$("#savekey").onclick=()=>{LS.set("autoModel",null);LS.set("fast",$("#fast").checked);LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
 // ---------- photos
 async function shrink(file){
   const url=URL.createObjectURL(file);
   try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
-    const max=1600,sc=Math.min(1,max/Math.max(img.width,img.height));
+    const max=1280,sc=Math.min(1,max/Math.max(img.width,img.height));
     const c=document.createElement("canvas");c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
     c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-    const data=c.toDataURL("image/jpeg",0.82);return {data:data.split(",")[1],preview:data};}
+    const data=c.toDataURL("image/jpeg",0.75);return {data:data.split(",")[1],preview:data};}
   finally{URL.revokeObjectURL(url);}
 }
 async function addFiles(list){for(const f of list){try{photos.push(await shrink(f));}catch(e){}}renderThumbs();}
@@ -235,7 +236,8 @@ function pickModel(names){
   const ver=n=>{const m=n.match(/gemini-(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):0;};
   const cand=names.filter(n=>/flash/.test(n)&&!bad.test(n));
   const stable=cand.filter(n=>!/preview|latest/.test(n));
-  const order=(a,b)=>(ver(b)-ver(a))||((/lite/.test(a)?1:0)-(/lite/.test(b)?1:0));
+  const fast=LS.get("fast",false);
+  const order=(a,b)=>fast?(((/lite/.test(b)?1:0)-(/lite/.test(a)?1:0))||(ver(b)-ver(a))):((ver(b)-ver(a))||((/lite/.test(a)?1:0)-(/lite/.test(b)?1:0)));
   return (stable.sort(order)[0])||(cand.sort(order)[0])||(names.includes("gemini-flash-latest")?"gemini-flash-latest":null);
 }
 async function resolveModel(key,force){
@@ -254,19 +256,25 @@ async function gemini(parts,opt={}){
   let model;
   try{ model=await resolveModel(key,false); }
   catch(e){ if(e.friendly) throw e; if(e.status===400||e.status===401||e.status===403) throw {friendly:"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).",detail:`${e.status} – ${e.detail}`}; model="gemini-flash-latest"; }
-  let triedRefresh=false;
-  for(let attempt=0;attempt<3;attempt++){
+  let triedRefresh=false, noThink=false; const t0=Date.now();
+  const thinkFor=m=>{const v=parseFloat((m.match(/gemini-(\d+(?:\.\d+)?)/)||[])[1]||0); if(v>=3) return {thinkingLevel:"low"}; if(v>=2.5) return {thinkingBudget:0}; return null;};
+  for(let attempt=0;attempt<4;attempt++){
     let r;
+    const tc=noThink?null:thinkFor(model);
+    body.generationConfig=Object.assign({},body.generationConfig||{}); if(tc) body.generationConfig.thinkingConfig=tc; else delete body.generationConfig.thinkingConfig;
+    if(!Object.keys(body.generationConfig).length) delete body.generationConfig;
     try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)}); }
     catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova.",detail:String(e&&e.message||e)}; }
     let j=null, msg=""; try{ j=await r.json(); msg=(j&&j.error&&j.error.message)||""; }catch(e){}
     const detail=`${r.status} – ${model}${msg?" – "+msg:""}`;
     if(r.status===404&&!triedRefresh){ triedRefresh=true; LS.set("autoModel",null); if(LS.get("model","auto")!=="auto") LS.set("model","auto"); try{ model=await resolveModel(key,true); continue; }catch(e){ throw {friendly:"Il modello di Gemini non è più disponibile.",detail}; } }
+    if(r.status===400&&!noThink&&/think/i.test(msg)){ noThink=true; continue; }
     if((r.status===500||r.status===503)&&attempt<2){ await new Promise(s=>setTimeout(s,2500)); continue; }
     if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto.",detail};
     if(r.status===400||r.status===401||r.status===403){ if(opt.plain&&opt.tools&&!/key/i.test(msg)) throw {toolfail:true,detail}; throw {friendly:/API key|api_key|permission|PERMISSION/i.test(msg)?"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).":"La richiesta non è andata a buon fine: riprova con foto più nitide o con il testo.",detail}; }
     if(!r.ok) throw {friendly:r.status===503?"Gemini è sovraccarico in questo momento: riprova tra qualche minuto.":"Il servizio non risponde ora: riprova tra poco.",detail};
-    const txt=j?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("")||"";
+    const txt=j?.candidates?.[0]?.content?.parts?.filter(p=>!p.thought).map(p=>p.text||"").join("")||"";
+    LS.set("lastRun",{sec:Math.round((Date.now()-t0)/1000),model,when:new Date().toLocaleString("it-IT")});
     if(!txt) throw {friendly:"Gemini non ha restituito una risposta: riprova.",detail:`${detail} – ${j?.promptFeedback?.blockReason||j?.candidates?.[0]?.finishReason||"vuota"}`};
     if(opt.plain) return txt;
     try{return JSON.parse(txt.replace(/^```json|```$/g,"").trim());}catch(e){throw {friendly:"Non sono riuscita a leggere bene la ricetta: prova con foto più nitide o incolla il testo.",detail:"risposta non in formato JSON"};}
