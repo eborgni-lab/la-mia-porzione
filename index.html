@@ -90,16 +90,18 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione<span class="ver">v3</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v4</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
     <p>Incolla la chiave di Google Gemini. Resta salvata solo su questo telefono.</p>
     <p><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Crea la chiave su Google AI Studio</a></p>
     <input type="password" id="key" placeholder="Chiave Gemini" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label></p>
+    <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label><small style="display:block;color:var(--muted);margin-top:4px">Lascia «auto»: l'app sceglie da sola il modello Flash più recente disponibile.</small></p>
+    <button class="btn ghost" id="testkey" type="button" style="width:100%;margin-bottom:10px">Prova la connessione</button>
+    <div id="testout" class="datanote" aria-live="polite"></div>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
-    <p class="datanote">Versione 3. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
+    <p class="datanote">Versione 4. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
   <section id="main">
@@ -158,7 +160,8 @@ const FOOD = new Map(DB.map(f=>[f[0].toLowerCase(),f]));
 const N = {kcal:0,prot:1,carb:2,sug:3,fat:4,sat:5,fib:6,Ca:7,Fe:8};
 const $=s=>document.querySelector(s);
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
-const DEFAULT_MODEL="gemini-flash-latest", FALLBACK_MODEL="gemini-2.5-flash";
+const DEFAULT_MODEL="auto";
+(function(){const sm=LS.get("model","auto");if(["gemini-flash-latest","gemini-2.5-flash",""].includes(sm))LS.set("model","auto");})();
 let meal=LS.get("meal","Pranzo"), photos=[], busy=false, src="testo";
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{src=b.dataset.src;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("hidden",p.dataset.pane!==src));});
 
@@ -171,7 +174,16 @@ function renderMeals(){const box=$("#meals");box.innerHTML="";$("#mealname").tex
 function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);}}
 $("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
 $("#closesetup").onclick=()=>showSetup(false);
-$("#savekey").onclick=()=>{LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
+$("#testkey").onclick=async()=>{
+  const key=$("#key").value.trim(); const out=$("#testout");
+  if(!key){out.textContent="Incolla prima la chiave.";return;}
+  out.textContent="Controllo…";
+  try{ const names=await listModels(key); const m=($("#model").value.trim()||"auto")==="auto"?pickModel(names):$("#model").value.trim();
+       const ok=names.includes(m);
+       out.innerHTML=`Chiave valida: ${names.length} modelli disponibili.<br>Modello che verrà usato: <b>${esc(m||"nessuno")}</b>${ok?"":" (non presente nell'elenco!)"}`; }
+  catch(e){ out.textContent=`Errore ${e.status||""}: ${e.detail||"impossibile collegarsi"}`; }
+};
+$("#savekey").onclick=()=>{LS.set("autoModel",null);LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
 // ---------- photos
 async function shrink(file){
   const url=URL.createObjectURL(file);
@@ -211,24 +223,55 @@ const SCHEMA={type:"OBJECT",properties:{
   ingredienti:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"},trascurabile:{type:"BOOLEAN"}},required:["nome","grammi","trascurabile"]}},
   sostituzioni:{type:"ARRAY",items:{type:"STRING"}},extra:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"}},required:["nome","grammi"]}},procedimento:{type:"ARRAY",items:{type:"STRING"}},tempo:{type:"STRING"}},
   required:["titolo","porzioni","ingredienti","procedimento"]};
+// scelta automatica del modello: cerca tra i modelli disponibili per questa chiave
+async function listModels(key){
+  const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200",{headers:{"x-goog-api-key":key}});
+  let j={}; try{j=await r.json();}catch(e){}
+  if(!r.ok) throw {status:r.status,detail:(j.error&&j.error.message)||""};
+  return (j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name.replace(/^models\//,""));
+}
+function pickModel(names){
+  const bad=/(tts|image|live|audio|embed|transcribe|omni|robotics|computer|thinking|exp)/i;
+  const ver=n=>{const m=n.match(/gemini-(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):0;};
+  const cand=names.filter(n=>/flash/.test(n)&&!bad.test(n));
+  const stable=cand.filter(n=>!/preview|latest/.test(n));
+  const order=(a,b)=>(ver(b)-ver(a))||((/lite/.test(a)?1:0)-(/lite/.test(b)?1:0));
+  return (stable.sort(order)[0])||(cand.sort(order)[0])||(names.includes("gemini-flash-latest")?"gemini-flash-latest":null);
+}
+async function resolveModel(key,force){
+  const saved=LS.get("model","auto");
+  if(!force&&saved&&saved!=="auto") return saved;
+  const cached=LS.get("autoModel",null);
+  if(!force&&cached&&cached.day===todayKey()) return cached.name;
+  const name=pickModel(await listModels(key));
+  if(!name) throw {friendly:"Con questa chiave non trovo un modello Gemini adatto.",detail:"Nessun modello 'flash' disponibile"};
+  LS.set("autoModel",{name,day:todayKey()}); return name;
+}
 async function gemini(parts,opt={}){
   const key=LS.get("key",""); if(!key){showSetup(true);throw {friendly:"Prima serve la chiave: chiedi ai tuoi genitori di inserirla."};}
-  const body=opt.plain?{contents:[{role:"user",parts}],tools:opt.tools||undefined,generationConfig:{temperature:0.1}}
-                      :{contents:[{role:"user",parts}],generationConfig:{temperature:0.2,responseMimeType:"application/json",responseSchema:SCHEMA}};
-  let model=LS.get("model",DEFAULT_MODEL);
-  for(let attempt=0;attempt<2;attempt++){
+  const body=opt.plain?{contents:[{role:"user",parts}],tools:opt.tools||undefined}
+                      :{contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json",responseSchema:SCHEMA}};
+  let model;
+  try{ model=await resolveModel(key,false); }
+  catch(e){ if(e.friendly) throw e; if(e.status===400||e.status===401||e.status===403) throw {friendly:"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).",detail:`${e.status} – ${e.detail}`}; model="gemini-flash-latest"; }
+  let triedRefresh=false;
+  for(let attempt=0;attempt<3;attempt++){
     let r;
     try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)}); }
-    catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova."}; }
-    if(r.status===404&&model!==FALLBACK_MODEL){model=FALLBACK_MODEL;continue;}
-    if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto."};
-    if(r.status===400||r.status===401||r.status===403){ let m=""; try{m=(await r.json()).error.message||"";}catch(e){} if(opt.plain&&opt.tools&&!/key/i.test(m)) throw {toolfail:true}; throw {friendly:/key|API key|permission/i.test(m)?"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).":"La richiesta non è andata a buon fine: riprova con foto più nitide o con il testo."}; }
-    if(!r.ok) throw {friendly:"Il servizio non risponde ora: riprova tra poco."};
-    const j=await r.json();
+    catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova.",detail:String(e&&e.message||e)}; }
+    let j=null, msg=""; try{ j=await r.json(); msg=(j&&j.error&&j.error.message)||""; }catch(e){}
+    const detail=`${r.status} – ${model}${msg?" – "+msg:""}`;
+    if(r.status===404&&!triedRefresh){ triedRefresh=true; LS.set("autoModel",null); if(LS.get("model","auto")!=="auto") LS.set("model","auto"); try{ model=await resolveModel(key,true); continue; }catch(e){ throw {friendly:"Il modello di Gemini non è più disponibile.",detail}; } }
+    if((r.status===500||r.status===503)&&attempt<2){ await new Promise(s=>setTimeout(s,2500)); continue; }
+    if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto.",detail};
+    if(r.status===400||r.status===401||r.status===403){ if(opt.plain&&opt.tools&&!/key/i.test(msg)) throw {toolfail:true,detail}; throw {friendly:/API key|api_key|permission|PERMISSION/i.test(msg)?"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).":"La richiesta non è andata a buon fine: riprova con foto più nitide o con il testo.",detail}; }
+    if(!r.ok) throw {friendly:r.status===503?"Gemini è sovraccarico in questo momento: riprova tra qualche minuto.":"Il servizio non risponde ora: riprova tra poco.",detail};
     const txt=j?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("")||"";
+    if(!txt) throw {friendly:"Gemini non ha restituito una risposta: riprova.",detail:`${detail} – ${j?.promptFeedback?.blockReason||j?.candidates?.[0]?.finishReason||"vuota"}`};
     if(opt.plain) return txt;
-    try{return JSON.parse(txt.replace(/^```json|```$/g,"").trim());}catch(e){throw {friendly:"Non sono riuscita a leggere bene la ricetta: prova con foto più nitide o incolla il testo."};}
+    try{return JSON.parse(txt.replace(/^```json|```$/g,"").trim());}catch(e){throw {friendly:"Non sono riuscita a leggere bene la ricetta: prova con foto più nitide o incolla il testo.",detail:"risposta non in formato JSON"};}
   }
+  throw {friendly:"Il servizio non risponde ora: riprova tra poco.",detail:"tentativi esauriti"};
 }
 
 // ---------- web page
@@ -324,10 +367,10 @@ $("#go").onclick=async()=>{
     if(rec.non_ricetta||!Array.isArray(rec.ingredienti)||!rec.ingredienti.length) throw {friendly:"Non ho trovato una ricetta: prova con un'altra foto, un altro testo o un'altra pagina."};
     const p=plan(rec); if(!p) throw {friendly:"Non riesco a riconoscere gli ingredienti: prova a incollare il testo."};
     const view=buildView(rec,p); showResult(view,true);
-  }catch(e){ showErr(e&&e.friendly?e.friendly:"Qualcosa non ha funzionato: riprova."); }
+  }catch(e){ showErr(e&&e.friendly?e.friendly:"Qualcosa non ha funzionato: riprova.", e&&e.detail); }
   finally{clearInterval(tick);busy=false;$("#go").disabled=false;$("#status").textContent="";}
 };
-function showErr(t){const e=$("#err");e.textContent=t;e.classList.remove("hidden");}
+function showErr(t,detail){const e=$("#err");e.innerHTML=esc(t)+(detail?`<details style="margin-top:6px;font-size:13px"><summary>Dettagli tecnici</summary>${esc(detail)}</details>`:"");e.classList.remove("hidden");}
 function buildView(rec,p){
   const f=p.div?1:p.scale;
   const ing=rec.ingredienti.map(i=> i.trascurabile? `${i.nome}: quanto basta` : (i.alimento&&FOOD.has(String(i.alimento).toLowerCase())? qty(i,f) : `${i.nome}: poco, come nella ricetta`));
