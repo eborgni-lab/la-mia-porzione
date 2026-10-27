@@ -7,14 +7,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="La mia porzione">
-<meta name="theme-color" content="#2E5E3E">
+<meta name="theme-color" content="#1E5A78">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <title>La mia porzione</title>
 <style>
-:root{--bg:#F3F6F1;--surface:#FFFFFF;--ink:#1D2A22;--muted:#5F6D64;--line:#D7E0D8;--accent:#2E5E3E;--accent-ink:#FFFFFF;--soft:#E3EEE5;--warm:#C9762B;--warmbg:#FBEFE1;
+:root{--bg:#F2F6F9;--surface:#FFFFFF;--ink:#182630;--muted:#5B6B76;--line:#D5E0E7;--accent:#1E5A78;--accent-ink:#FFFFFF;--soft:#E1EDF3;--warm:#C9762B;--warmbg:#FBEFE1;
   color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root{--bg:#121815;--surface:#1A221E;--ink:#E6EEE8;--muted:#9BA9A1;--line:#2C3832;--accent:#7FC495;--accent-ink:#0F1A13;--soft:#22312A;--warm:#E9A64B;--warmbg:#3A2C17;color-scheme:dark}}
+@media (prefers-color-scheme:dark){:root{--bg:#10171C;--surface:#172129;--ink:#E5EEF3;--muted:#9AAAB5;--line:#2A3843;--accent:#7CC0DE;--accent-ink:#0B1720;--soft:#1F2E37;--warm:#E9A64B;--warmbg:#3A2C17;color-scheme:dark}}
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Calibri,"Segoe UI",sans-serif;font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
@@ -25,8 +25,14 @@ h1{font-size:26px;line-height:1.15;margin:6px 0}
 .lead{color:var(--muted);margin:0 0 16px}
 h2{font-size:17px;margin:20px 0 8px}
 .meals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.meals button{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px 6px;cursor:pointer}
-.meals button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.meals button{font:inherit;font-size:30px;line-height:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;padding:14px 6px;cursor:pointer}
+.mealname{margin-top:8px;text-align:center;color:var(--muted);font-size:15px;min-height:1.4em}
+.notes{display:block;margin-top:14px}
+.notes span{display:block;font-weight:600;margin-bottom:6px}
+.notes small{font-weight:400;color:var(--muted)}
+.notes textarea{min-height:64px}
+.ver{font-size:12px;font-weight:600;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+.meals button[aria-pressed="true"]{background:var(--soft);border:2px solid var(--accent);box-shadow:0 0 0 2px var(--soft)}
 .big{display:flex;gap:8px;flex-wrap:wrap}
 .btn{font:inherit;font-weight:600;border:0;border-radius:14px;padding:14px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink);text-align:center}
 .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:500}
@@ -57,6 +63,16 @@ details.paste summary{cursor:pointer;color:var(--muted)}
 .saved button.open{flex:1;text-align:left;font:inherit;background:transparent;border:0;color:var(--ink);padding:12px 2px;cursor:pointer}
 .saved button.del{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;padding:8px}
 .hidden{display:none!important}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:4px 0 16px}
+.tip .lab{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.tip p{margin:6px 0 6px;font-size:17px}
+.tip .src{font-size:13px;color:var(--muted)}
+.tip .src a{color:var(--muted)}
+.week{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.week .lab2{font-size:14px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips button{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.datanote{font-size:14px;color:var(--muted);margin-top:14px}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--soft);padding:4px;border-radius:14px}
 .tabs button{font:inherit;font-size:15px;border:0;border-radius:11px;padding:10px 4px;background:transparent;color:var(--ink);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--surface);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
@@ -74,7 +90,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione</h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v3</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
@@ -83,20 +99,28 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
     <input type="password" id="key" placeholder="Chiave Gemini" autocomplete="off" autocapitalize="off" spellcheck="false">
     <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label></p>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
+    <p class="datanote">Versione 3. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
   <section id="main">
-    <p class="lead">Fotografa una ricetta, incollala, scrivi un'idea o usa il link di una pagina: te la preparo nella porzione giusta per te.</p>
+    <div class="tip" id="tip">
+      <div class="lab">Idea di oggi</div>
+      <p id="tiptext"></p>
+      <div class="src" id="tipsrc"></div>
+      <div class="week"><div class="lab2">Questa settimana prova</div><div class="chips" id="weekchips"></div></div>
+    </div>
+    <p class="lead">Scrivi un'idea o incolla una ricetta, oppure fotografala o usa il link di una pagina: te la preparo nella porzione giusta per te.</p>
     <h2>Per quale pasto?</h2>
-    <div class="meals" id="meals"></div>
+    <div class="meals" id="meals" role="group" aria-label="Pasto"></div>
+    <div class="mealname" id="mealname" aria-live="polite"></div>
 
     <h2>La ricetta</h2>
     <div class="tabs" role="tablist">
-      <button role="tab" data-src="foto" aria-selected="true">Foto</button>
-      <button role="tab" data-src="testo" aria-selected="false">Testo</button>
+      <button role="tab" data-src="testo" aria-selected="true">Testo</button>
+      <button role="tab" data-src="foto" aria-selected="false">Foto</button>
       <button role="tab" data-src="link" aria-selected="false">Pagina web</button>
     </div>
-    <div class="pane" data-pane="foto">
+    <div class="pane hidden" data-pane="foto">
       <div class="big">
         <label class="btn grow" for="cam">Fotografa</label>
         <label class="btn ghost grow" for="lib">Dalla galleria</label>
@@ -105,12 +129,14 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
       <input id="lib" type="file" accept="image/*" multiple class="hidden">
       <div class="thumbs" id="thumbs"></div>
     </div>
-    <div class="pane hidden" data-pane="testo">
+    <div class="pane" data-pane="testo">
       <textarea id="text" placeholder="Incolla una ricetta oppure scrivi un'idea, per esempio: pasta e piselli come la fa la nonna"></textarea>
     </div>
     <div class="pane hidden" data-pane="link">
       <input type="text" id="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Incolla l'indirizzo della pagina (https://…)">
     </div>
+    <label class="notes" for="notes"><span>Note per me <small>(facoltative)</small></span>
+      <textarea id="notes" rows="2" placeholder="Per esempio: mangerò anche una mela · non mi piace l'aglio"></textarea></label>
     <label class="switch"><input type="checkbox" id="veg" checked><span>Versione vegetariana<small>Con latte e uova: carne e pesce vengono sostituiti.</small></span></label>
     <button class="btn go" id="go">Prepara la mia porzione</button>
     <div class="status" id="status" aria-live="polite"></div>
@@ -125,20 +151,22 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
   </section>
 </div>
 <script>
-const DB = [["Pasta di semola (cruda)", "Cereali", 353, 12.5, 71, 3, 1.5, 0.3, 3, 22, 1.4], ["Pasta integrale (cruda)", "Cereali", 338, 13.4, 64, 3, 2.5, 0.4, 8, 35, 3], ["Riso bianco (crudo)", "Cereali", 334, 6.7, 80.4, 0.2, 0.4, 0.1, 1, 24, 0.8], ["Riso integrale (crudo)", "Cereali", 337, 7.5, 77, 0.8, 1.9, 0.4, 3.5, 23, 1.5], ["Farro (crudo)", "Cereali", 335, 15.1, 67.1, 1, 2.5, 0.4, 6.8, 43, 2.5], ["Quinoa (cruda)", "Cereali", 368, 14.1, 57, 0, 6.1, 0.7, 7, 47, 4.6], ["Fiocchi d'avena", "Cereali", 372, 13, 60, 1, 7, 1.2, 10, 52, 4.3], ["Pane comune", "Cereali", 275, 8.6, 58, 2.5, 0.5, 0.1, 3.1, 17, 0.7], ["Pane integrale", "Cereali", 243, 9, 46, 3, 1.6, 0.3, 6.5, 30, 2], ["Patate", "Tuberi", 85, 2.1, 18, 0.4, 0.1, 0, 1.6, 10, 0.6], ["Lenticchie secche", "Legumi", 325, 22.7, 51.1, 1.8, 2.5, 0.3, 13.8, 57, 8], ["Lenticchie al vapore", "Legumi", 130, 9.08, 20.44, 0.72, 1, 0.12, 5.52, 22.8, 3.2], ["Ceci secchi", "Legumi", 334, 20.9, 46.9, 2.6, 6.3, 0.6, 13.6, 142, 6.1], ["Fagioli borlotti secchi", "Legumi", 291, 20.2, 47.5, 2.5, 2, 0.3, 17.3, 102, 9], ["Ceci in scatola (sgocciolati)", "Legumi", 119, 6.7, 15, 0.5, 2.4, 0.3, 6, 40, 1.3], ["Fagioli in scatola (sgocciolati)", "Legumi", 90, 6, 12, 0.5, 0.5, 0.1, 6, 40, 1.5], ["Piselli surgelati", "Legumi", 71, 5.5, 9, 4, 0.4, 0.1, 5, 25, 1.5], ["Tofu (coagulato con calcio)", "Derivati soia", 120, 13, 1.5, 0.5, 7, 1, 1, 350, 2.5], ["Tempeh", "Derivati soia", 192, 20.3, 6, 0, 10.8, 2.2, 4, 111, 2.7], ["Seitan", "Proteici vegetali", 121, 22, 4, 0.5, 2, 0.3, 0.6, 40, 1.5], ["Bevanda di soia arricchita (no zuccheri)", "Bevande vegetali", 33, 3.3, 0.7, 0.3, 1.8, 0.3, 0.6, 120, 0.4], ["Uova intere", "Uova", 128, 12.4, 0, 0, 8.7, 3.2, 0, 48, 1.5], ["Latte parzialmente scremato", "Latte e derivati", 46, 3.5, 5, 5, 1.5, 1, 0, 120, 0.1], ["Yogurt bianco intero", "Latte e derivati", 66, 3.8, 4.3, 4.3, 3.9, 2.5, 0, 125, 0.1], ["Yogurt greco 0%", "Latte e derivati", 59, 10.2, 3.6, 3.2, 0.4, 0.1, 0, 110, 0.1], ["Fiocchi di latte", "Latte e derivati", 98, 11.1, 3.4, 2.7, 4.3, 1.7, 0, 83, 0.1], ["Ricotta vaccina", "Latte e derivati", 146, 8.8, 3.5, 3.5, 10.9, 7, 0, 295, 0.4], ["Mozzarella vaccina", "Latte e derivati", 253, 18.7, 0.7, 0.7, 19.5, 12, 0, 350, 0.2], ["Stracchino", "Latte e derivati", 300, 18.5, 0, 0, 25.1, 16, 0, 567, 0.3], ["Spinaci crudi", "Verdure", 31, 3.4, 2.9, 0.4, 0.7, 0.1, 1.9, 78, 2.9], ["Broccoli", "Verdure", 34, 2.8, 4, 1.7, 0.4, 0.1, 2.6, 47, 0.7], ["Cavolo nero", "Verdure", 42, 3.5, 3.5, 1, 0.9, 0.1, 3.6, 190, 1.5], ["Pomodori", "Verdure", 19, 1, 3.5, 3.5, 0.2, 0, 1, 11, 0.3], ["Zucchine", "Verdure", 17, 1.2, 2.2, 1.7, 0.3, 0.1, 1, 16, 0.4], ["Carote", "Verdure", 39, 1.1, 7.6, 7.6, 0.2, 0, 3.1, 44, 0.7], ["Peperoni rossi", "Verdure", 26, 0.9, 4.2, 4.2, 0.3, 0, 1.9, 17, 0.4], ["Lattuga", "Verdure", 19, 1.4, 2.2, 0.8, 0.2, 0, 1.5, 36, 0.9], ["Rucola", "Verdure", 25, 2.6, 2.1, 2, 0.7, 0.1, 1.6, 160, 1.5], ["Cime di rapa", "Verdure", 22, 2.9, 2, 0.4, 0.3, 0, 2.9, 97, 1.5], ["Cavolfiore", "Verdure", 25, 3.2, 2.7, 2.4, 0.2, 0, 2.4, 44, 0.6], ["Verza", "Verdure", 19, 2.1, 2.5, 2.3, 0.1, 0, 2.9, 35, 0.5], ["Cavolini di Bruxelles", "Verdure", 43, 4.2, 5.2, 2.2, 0.3, 0.1, 3.8, 42, 1.4], ["Finocchio", "Verdure", 13, 1.2, 1, 1, 0, 0, 2.2, 45, 0.2], ["Radicchio rosso", "Verdure", 13, 1.4, 1.6, 1.6, 0.1, 0, 3, 36, 0.3], ["Zucca gialla", "Verdure", 18, 1.1, 3.5, 2.5, 0.1, 0, 2, 20, 0.9], ["Carciofi", "Verdure", 33, 2.7, 2.5, 1, 0.2, 0, 5.5, 86, 1], ["Porri", "Verdure", 29, 2.1, 5.2, 3.9, 0.1, 0, 2.9, 59, 1.1], ["Bietola", "Verdure", 17, 1.3, 2.8, 1.1, 0.2, 0, 1.2, 70, 1.5], ["Asparagi", "Verdure", 29, 3.6, 3.3, 1.9, 0.2, 0, 2.1, 24, 0.7], ["Fave fresche", "Legumi", 41, 5.2, 4.5, 1, 0.4, 0.1, 5, 22, 1.5], ["Melanzane", "Verdure", 20, 1.1, 2.6, 2.6, 0.1, 0, 2.6, 14, 0.3], ["Fagiolini", "Verdure", 24, 2.1, 2.4, 2, 0.1, 0, 2.9, 35, 0.9], ["Cetrioli", "Verdure", 12, 0.7, 1.8, 1.8, 0.1, 0, 0.8, 16, 0.3], ["Cipolla", "Verdure", 26, 1, 5.7, 5.7, 0.1, 0, 1, 25, 0.4], ["Mela", "Frutta", 53, 0.3, 11.4, 10.4, 0.2, 0, 2.4, 6, 0.1], ["Banana", "Frutta", 91, 1.1, 20.2, 12.2, 0.3, 0.1, 2.6, 5, 0.3], ["Arancia", "Frutta", 47, 0.9, 9.4, 9.4, 0.1, 0, 2.4, 40, 0.1], ["Kiwi", "Frutta", 61, 1.1, 11.7, 9, 0.5, 0, 3, 34, 0.3], ["Fragole", "Frutta", 32, 0.7, 5.7, 4.9, 0.3, 0, 2, 16, 0.4], ["Mandarini", "Frutta", 53, 0.8, 11.5, 10.6, 0.3, 0, 1.8, 37, 0.2], ["Pompelmo", "Frutta", 29, 0.6, 6.2, 6.2, 0.1, 0, 1.6, 17, 0.1], ["Ciliegie", "Frutta", 38, 0.8, 9, 9, 0.1, 0, 1.3, 16, 0.4], ["Albicocche", "Frutta", 32, 0.4, 6.8, 6.8, 0.1, 0, 1.5, 16, 0.5], ["Pesche", "Frutta", 35, 0.8, 8, 8, 0.1, 0, 1.6, 6, 0.4], ["Susine", "Frutta", 46, 0.5, 10.5, 10.5, 0.1, 0, 1.5, 13, 0.2], ["Anguria", "Frutta", 17, 0.4, 3.7, 3.7, 0, 0, 0.2, 7, 0.2], ["Melone", "Frutta", 33, 0.8, 7.4, 7.4, 0.2, 0, 0.7, 9, 0.3], ["Fichi", "Frutta", 52, 0.9, 11.2, 11.2, 0.2, 0, 2, 43, 0.5], ["Mirtilli", "Frutta", 57, 0.7, 12.1, 10, 0.3, 0, 2.4, 6, 0.3], ["Uva", "Frutta", 64, 0.5, 15.6, 15.6, 0.1, 0, 1.5, 27, 0.4], ["Pere", "Frutta", 42, 0.3, 8.8, 8.8, 0.1, 0, 3.1, 6, 0.3], ["Cachi", "Frutta", 70, 0.6, 16, 16, 0.3, 0, 2.5, 8, 0.3], ["Melagrana", "Frutta", 80, 1.7, 14.7, 13.7, 1.2, 0.1, 4, 10, 0.3], ["Castagne fresche", "Frutta secca e semi", 180, 2.9, 36.7, 8.9, 1.7, 0.3, 4.7, 30, 0.9], ["Mandorle", "Frutta secca e semi", 595, 21.2, 9.1, 4.4, 49.9, 3.8, 12.5, 269, 3.7], ["Noci", "Frutta secca e semi", 689, 15.2, 7, 2.6, 65.2, 6.1, 6.7, 98, 2.9], ["Semi di zucca", "Frutta secca e semi", 593, 30.2, 4.7, 1.4, 49.1, 8.7, 6, 46, 8.8], ["Semi di lino", "Frutta secca e semi", 514, 18.3, 1.6, 1.6, 42.2, 3.7, 27.3, 255, 5.7], ["Tahina (crema di sesamo)", "Frutta secca e semi", 618, 17, 11.9, 0.5, 53.8, 7.5, 9.3, 426, 8.9], ["Burro di arachidi", "Frutta secca e semi", 610, 25, 12, 6, 50, 10, 6, 45, 1.9], ["Olio extravergine d'oliva", "Grassi", 899, 0, 0, 0, 99.9, 14.5, 0, 0, 0.6], ["Burro", "Grassi", 758, 0.8, 1.1, 1.1, 83.4, 51, 0, 24, 0.1], ["Manzo magro (crudo)", "Carne", 129, 21.3, 0, 0, 5, 2, 0, 4, 2], ["Petto di pollo (crudo)", "Carne", 100, 23.3, 0, 0, 0.8, 0.3, 0, 4, 0.4], ["Lonza di maiale (cruda)", "Carne", 146, 21, 0, 0, 6.8, 2.4, 0, 7, 0.8], ["Gelato alla crema / fior di latte", "Dolci e occasionali", 200, 3.5, 24, 21, 10, 6.5, 0.5, 120, 0.1], ["Gelato al cioccolato", "Dolci e occasionali", 230, 4, 26, 22, 12, 7.5, 1.5, 110, 0.9], ["Sorbetto / gelato alla frutta", "Dolci e occasionali", 130, 0.5, 31, 28, 0.2, 0, 0.5, 10, 0.2], ["Crostata di frutta / marmellata", "Dolci e occasionali", 380, 5.5, 60, 30, 13, 6.5, 1.8, 30, 1], ["Biscotti secchi", "Dolci e occasionali", 416, 6.6, 80, 22, 7.9, 2.5, 2.5, 30, 1.5], ["Cornetto / brioche", "Dolci e occasionali", 410, 7.5, 47, 15, 21, 11, 2, 30, 1], ["Pizza margherita", "Dolci e occasionali", 250, 10.5, 33, 2.5, 8, 3.5, 2, 180, 1.2], ["Cioccolato fondente 70%", "Altro", 572, 7.8, 34, 24, 42.6, 24.5, 10.9, 73, 11.9], ["Latte intero", "Latte e derivati", 64, 3.3, 4.9, 4.9, 3.6, 2.3, 0, 119, 0.1], ["Formaggino a caglio microbico (tipo Babybel)", "Latte e derivati", 306, 22, 0, 0, 24, 16, 0, 700, 0.2], ["Formaggio duro a caglio vegetale (tipo Gran Kinara)", "Latte e derivati", 390, 32, 0, 0, 28, 18, 0, 1100, 0.4], ["Crackers integrali", "Snack portatili", 430, 10, 65, 2, 13, 1.5, 7, 40, 2.5], ["Grissini", "Snack portatili", 410, 12, 70, 2.5, 9, 1.2, 3.5, 25, 1.4], ["Gallette di riso integrale", "Snack portatili", 380, 8, 78, 0.5, 3, 0.6, 4, 10, 1.5], ["Albicocche secche", "Snack portatili", 241, 3.4, 55, 53, 0.5, 0, 7.3, 55, 2.7], ["Fichi secchi", "Snack portatili", 249, 3.3, 54, 47.9, 0.9, 0.1, 9.8, 162, 2], ["Nocciole", "Frutta secca e semi", 628, 15, 7, 4.3, 60.8, 4.5, 9.7, 114, 4.7], ["Pistacchi (sgusciati)", "Frutta secca e semi", 560, 20, 16.6, 7.7, 45, 5.9, 10.6, 105, 3.9], ["Lenticchie rosse decorticate (secche)", "Legumi", 345, 24, 52, 2, 2.2, 0.3, 10.8, 48, 7.4], ["Cous cous (crudo)", "Cereali", 360, 12.8, 72.4, 0.5, 0.6, 0.1, 5, 24, 1.1], ["Orzo perlato (crudo)", "Cereali", 319, 10.4, 70.5, 0.8, 1.4, 0.3, 9.2, 29, 2.5], ["Passata di pomodoro", "Verdure", 21, 1.3, 3.5, 3.5, 0.2, 0, 1.5, 10, 0.9], ["Fette biscottate integrali", "Cereali", 410, 12, 70, 6, 7, 1.2, 9, 40, 2.5], ["Confettura extra di frutta", "Dolci e occasionali", 250, 0.4, 60, 55, 0.1, 0, 1, 15, 0.4], ["Miele", "Dolci e occasionali", 304, 0.3, 82, 82, 0, 0, 0.2, 6, 0.4], ["Cacao amaro in polvere", "Altro", 359, 19.6, 21, 1.8, 13.7, 8.1, 37, 128, 13.9], ["Semi di sesamo", "Frutta secca e semi", 573, 17.7, 11.7, 0.3, 49.7, 7, 11.8, 975, 14.6], ["Farina di ceci", "Legumi", 359, 22.4, 47, 10.9, 6.7, 0.7, 10.8, 45, 4.9], ["Farina di frumento tipo 0", "Cereali", 343, 11.5, 72, 1.7, 1, 0.2, 2.9, 17, 0.9], ["Farina integrale di frumento", "Cereali", 319, 12, 61, 2, 1.9, 0.3, 9, 28, 3], ["Pane grattugiato", "Cereali", 380, 12, 74, 4, 3.5, 0.8, 4, 40, 2]];
-const MODULES = {"Colazione": {"kcal": 433.8, "prot": 16, "Ca": 350, "Fe": 2.5, "sugCap": 33.5}, "Spuntino": {"kcal": 108.5, "sugCap": 11}, "Pranzo": {"kcal": 759.2, "prot": 28, "Ca": 250, "Fe": 6.5, "sugCap": 10}, "Merenda": {"kcal": 216.9, "prot": 8, "Ca": 200, "Fe": 1.2, "sugCap": 14}, "Cena": {"kcal": 650.8, "prot": 24, "Ca": 250, "Fe": 5.5, "sugCap": 12}, "Cena con carne": {"kcal": 650.8, "Ca": 250, "Fe": 5.5, "sugCap": 12}};
+const DB = [["Pasta di semola (cruda)", "Cereali", 341, 13.5, 72.7, 2.2, 1.2, 0.22, 1.7, 22, 1.4], ["Pasta integrale (cruda)", "Cereali", 330, 13.3, 64.8, 3.0, 2.2, 0.35, 7.1, 35, 2.7], ["Riso bianco (crudo)", "Cereali", 334, 6.7, 80.4, 0.2, 0.4, 0.1, 1, 24, 0.8], ["Riso integrale (crudo)", "Cereali", 341, 7.5, 77.4, 1.2, 1.9, 0.4, 1.9, 32, 1.6], ["Farro (crudo)", "Cereali", 353, 14.6, 69.3, 2.4, 2.4, 0.38, 6.5, 35, 1.9], ["Quinoa (cruda)", "Cereali", 376, 15.4, 57.8, 5.3, 8.1, 2.45, 12.2, 46, 3.6], ["Fiocchi d'avena", "Cereali", 367, 8.0, 66.8, 0.6, 7.5, 1.29, 8.3, 54, 5.2], ["Pane comune", "Cereali", 275, 9.0, 57.6, 7.5, 1.9, 0.38, 3.1, 20, 1.0], ["Pane integrale", "Cereali", 224, 8.5, 44.1, 2, 1.3, 0.24, 6.5, 25, 2.5], ["Patate", "Tuberi", 85, 2.1, 18, 0.4, 0.1, 0, 1.6, 10, 0.6], ["Lenticchie secche", "Legumi", 291, 22.7, 51.1, 1.8, 1.0, 0.12, 13.8, 57, 8.0], ["Lenticchie al vapore", "Legumi", 116.4, 9.08, 20.44, 0.72, 0.4, 0.05, 5.52, 22.8, 3.2], ["Ceci secchi", "Legumi", 343, 20.9, 46.9, 3.7, 6.3, 0.77, 13.6, 142, 6.4], ["Fagioli borlotti secchi", "Legumi", 291, 20.2, 47.5, 2.5, 2, 0.3, 17.3, 102, 9], ["Ceci in scatola (sgocciolati)", "Legumi", 111, 6.7, 13.9, 1, 2.3, 0.29, 5.7, 43, 1.8], ["Fagioli in scatola (sgocciolati)", "Legumi", 102, 6.7, 15.9, 1, 0.5, 0.1, 5.5, 31, 2.2], ["Piselli surgelati", "Legumi", 71, 5.5, 9, 4, 0.4, 0.1, 5, 25, 1.5], ["Tofu (coagulato con calcio)", "Derivati soia", 120, 13, 1.5, 0.5, 7, 1, 1, 350, 2.5], ["Tempeh", "Derivati soia", 192, 20.3, 6, 0, 10.8, 2.2, 4, 111, 2.7], ["Seitan", "Proteici vegetali", 121, 22, 4, 0.5, 2, 0.3, 0.6, 40, 1.5], ["Bevanda di soia arricchita (no zuccheri)", "Bevande vegetali", 33, 3.3, 0.7, 0.3, 1.8, 0.3, 0.6, 120, 0.4], ["Uova intere", "Uova", 128, 12.4, 0, 0, 8.7, 3.57, 0, 48, 1.5], ["Latte parzialmente scremato", "Latte e derivati", 46, 3.5, 5.0, 5.0, 1.5, 0.84, 0, 120, 0.1], ["Yogurt bianco intero", "Latte e derivati", 66, 3.8, 4.3, 4.3, 3.9, 2.39, 0, 125, 0.1], ["Yogurt greco 0%", "Latte e derivati", 59, 10.2, 3.6, 3.2, 0.4, 0.1, 0, 110, 0.1], ["Fiocchi di latte", "Latte e derivati", 98, 11.1, 3.4, 2.7, 4.3, 1.7, 0, 83, 0.1], ["Ricotta vaccina", "Latte e derivati", 146, 8.8, 3.5, 3.5, 10.9, 7, 0, 295, 0.4], ["Mozzarella vaccina", "Latte e derivati", 253, 18.7, 0.7, 0.7, 19.5, 12, 0, 350, 0.2], ["Stracchino", "Latte e derivati", 300, 18.5, 0, 0, 25.1, 16, 0, 567, 0.3], ["Spinaci crudi", "Verdure", 31, 3.4, 2.9, 0.4, 0.7, 0.1, 1.9, 78, 2.9], ["Broccoli", "Verdure", 34, 2.8, 4, 1.7, 0.4, 0.1, 2.6, 47, 0.7], ["Cavolo nero", "Verdure", 42, 3.5, 3.5, 1, 0.9, 0.1, 3.6, 190, 1.5], ["Pomodori", "Verdure", 23, 1.0, 3.5, 3.5, 0.2, 0.0, 2.0, 9, 0.3], ["Zucchine", "Verdure", 17, 1.2, 2.2, 1.7, 0.3, 0.1, 1, 16, 0.4], ["Carote", "Verdure", 39, 1.1, 7.6, 7.6, 0.2, 0, 3.1, 44, 0.7], ["Peperoni rossi", "Verdure", 26, 0.9, 4.2, 4.2, 0.3, 0, 1.9, 17, 0.4], ["Lattuga", "Verdure", 19, 1.4, 2.2, 0.8, 0.2, 0, 1.5, 36, 0.9], ["Rucola", "Verdure", 25, 2.6, 2.1, 2, 0.7, 0.1, 1.6, 160, 1.5], ["Cime di rapa", "Verdure", 22, 2.9, 2, 0.4, 0.3, 0, 2.9, 97, 1.5], ["Cavolfiore", "Verdure", 25, 3.2, 2.7, 2.4, 0.2, 0, 2.4, 44, 0.6], ["Verza", "Verdure", 19, 2.1, 2.5, 2.3, 0.1, 0, 2.9, 35, 0.5], ["Cavolini di Bruxelles", "Verdure", 43, 4.2, 5.2, 2.2, 0.3, 0.1, 3.8, 42, 1.4], ["Finocchio", "Verdure", 13, 1.2, 1, 1, 0, 0, 2.2, 45, 0.2], ["Radicchio rosso", "Verdure", 13, 1.4, 1.6, 1.6, 0.1, 0, 3, 36, 0.3], ["Zucca gialla", "Verdure", 18, 1.1, 3.5, 2.5, 0.1, 0, 2, 20, 0.9], ["Carciofi", "Verdure", 33, 2.7, 2.5, 1, 0.2, 0, 5.5, 86, 1], ["Porri", "Verdure", 29, 2.1, 5.2, 3.9, 0.1, 0, 2.9, 59, 1.1], ["Bietola", "Verdure", 17, 1.3, 2.8, 1.1, 0.2, 0, 1.2, 70, 1.5], ["Asparagi", "Verdure", 29, 3.6, 3.3, 1.9, 0.2, 0, 2.1, 24, 0.7], ["Fave fresche", "Legumi", 41, 5.2, 4.5, 1, 0.4, 0.1, 5, 22, 1.5], ["Melanzane", "Verdure", 20, 1.1, 2.6, 2.6, 0.1, 0, 2.6, 14, 0.3], ["Fagiolini", "Verdure", 24, 2.1, 2.4, 2, 0.1, 0, 2.9, 35, 0.9], ["Cetrioli", "Verdure", 12, 0.7, 1.8, 1.8, 0.1, 0, 0.8, 16, 0.3], ["Cipolla", "Verdure", 26, 1, 5.7, 5.7, 0.1, 0, 1, 25, 0.4], ["Mela", "Frutta", 53, 0.3, 11.4, 10.4, 0.2, 0, 2.4, 6, 0.1], ["Banana", "Frutta", 91, 1.1, 20.2, 12.2, 0.3, 0.1, 2.6, 5, 0.3], ["Arancia", "Frutta", 47, 0.9, 9.4, 9.4, 0.1, 0, 2.4, 40, 0.1], ["Kiwi", "Frutta", 61, 1.1, 11.7, 9, 0.5, 0, 3, 34, 0.3], ["Fragole", "Frutta", 32, 0.7, 5.7, 4.9, 0.3, 0, 2, 16, 0.4], ["Mandarini", "Frutta", 53, 0.8, 11.5, 10.6, 0.3, 0, 1.8, 37, 0.2], ["Pompelmo", "Frutta", 29, 0.6, 6.2, 6.2, 0.1, 0, 1.6, 17, 0.1], ["Ciliegie", "Frutta", 38, 0.8, 9, 9, 0.1, 0, 1.3, 16, 0.4], ["Albicocche", "Frutta", 32, 0.4, 6.8, 6.8, 0.1, 0, 1.5, 16, 0.5], ["Pesche", "Frutta", 35, 0.8, 8, 8, 0.1, 0, 1.6, 6, 0.4], ["Susine", "Frutta", 46, 0.5, 10.5, 10.5, 0.1, 0, 1.5, 13, 0.2], ["Anguria", "Frutta", 17, 0.4, 3.7, 3.7, 0, 0, 0.2, 7, 0.2], ["Melone", "Frutta", 33, 0.8, 7.4, 7.4, 0.2, 0, 0.7, 9, 0.3], ["Fichi", "Frutta", 52, 0.9, 11.2, 11.2, 0.2, 0, 2, 43, 0.5], ["Mirtilli", "Frutta", 57, 0.7, 12.1, 10, 0.3, 0, 2.4, 6, 0.3], ["Uva", "Frutta", 64, 0.5, 15.6, 15.6, 0.1, 0, 1.5, 27, 0.4], ["Pere", "Frutta", 42, 0.3, 8.8, 8.8, 0.1, 0, 3.1, 6, 0.3], ["Cachi", "Frutta", 70, 0.6, 16, 16, 0.3, 0, 2.5, 8, 0.3], ["Melagrana", "Frutta", 80, 1.7, 14.7, 13.7, 1.2, 0.1, 4, 10, 0.3], ["Castagne fresche", "Frutta secca e semi", 180, 2.9, 36.7, 8.9, 1.7, 0.3, 4.7, 30, 0.9], ["Mandorle", "Frutta secca e semi", 628, 22.0, 4.6, 3.7, 55.3, 4.17, 12.7, 240, 3.0], ["Noci", "Frutta secca e semi", 689, 15.2, 7, 2.6, 65.2, 6.1, 6.7, 98, 2.9], ["Semi di zucca", "Frutta secca e semi", 593, 30.2, 4.7, 1.4, 49.1, 8.7, 6, 46, 8.8], ["Semi di lino", "Frutta secca e semi", 514, 18.3, 1.6, 1.6, 42.2, 3.7, 27.3, 255, 5.7], ["Tahina (crema di sesamo)", "Frutta secca e semi", 618, 17, 11.9, 0.5, 53.8, 7.5, 9.3, 426, 8.9], ["Burro di arachidi", "Frutta secca e semi", 610, 25, 12, 6, 50, 10, 6, 45, 1.9], ["Olio extravergine d'oliva", "Grassi", 899, 0, 0, 0, 99.9, 14.5, 0, 0, 0.6], ["Burro", "Grassi", 758, 0.8, 1.1, 1.1, 83.4, 51, 0, 24, 0.1], ["Manzo magro (crudo)", "Carne", 129, 21.3, 0, 0, 5, 2, 0, 4, 2], ["Petto di pollo (crudo)", "Carne", 100, 23.3, 0, 0, 0.8, 0.3, 0, 4, 0.4], ["Lonza di maiale (cruda)", "Carne", 146, 21, 0, 0, 6.8, 2.4, 0, 7, 0.8], ["Gelato alla crema / fior di latte", "Dolci e occasionali", 200, 3.5, 24, 21, 10, 6.5, 0.5, 120, 0.1], ["Gelato al cioccolato", "Dolci e occasionali", 230, 4, 26, 22, 12, 7.5, 1.5, 110, 0.9], ["Sorbetto / gelato alla frutta", "Dolci e occasionali", 130, 0.5, 31, 28, 0.2, 0, 0.5, 10, 0.2], ["Crostata di frutta / marmellata", "Dolci e occasionali", 380, 5.5, 60, 30, 13, 6.5, 1.8, 30, 1], ["Biscotti secchi", "Dolci e occasionali", 416, 6.6, 80, 22, 7.9, 2.5, 2.5, 30, 1.5], ["Cornetto / brioche", "Dolci e occasionali", 410, 7.5, 47, 15, 21, 11, 2, 30, 1], ["Pizza margherita", "Dolci e occasionali", 250, 10.5, 33, 2.5, 8, 3.5, 2, 180, 1.2], ["Cioccolato fondente 70%", "Altro", 572, 7.8, 34, 24, 42.6, 24.5, 10.9, 73, 11.9], ["Latte intero", "Latte e derivati", 64, 3.3, 4.9, 4.9, 3.6, 2.3, 0, 119, 0.1], ["Formaggino a caglio microbico (tipo Babybel)", "Latte e derivati", 306, 22, 0, 0, 24, 16, 0, 700, 0.2], ["Formaggio duro a caglio vegetale (tipo Gran Kinara)", "Latte e derivati", 390, 32, 0, 0, 28, 18, 0, 1100, 0.4], ["Crackers integrali", "Snack portatili", 430, 10, 65, 2, 13, 1.5, 7, 40, 2.5], ["Grissini", "Snack portatili", 410, 12, 70, 2.5, 9, 1.2, 3.5, 25, 1.4], ["Gallette di riso integrale", "Snack portatili", 380, 8, 78, 0.5, 3, 0.6, 4, 10, 1.5], ["Albicocche secche", "Snack portatili", 241, 3.4, 55, 53, 0.5, 0, 7.3, 55, 2.7], ["Fichi secchi", "Snack portatili", 249, 3.3, 54, 47.9, 0.9, 0.1, 9.8, 162, 2], ["Nocciole", "Frutta secca e semi", 628, 15, 7, 4.3, 60.8, 4.5, 9.7, 114, 4.7], ["Pistacchi (sgusciati)", "Frutta secca e semi", 560, 20, 16.6, 7.7, 45, 5.9, 10.6, 105, 3.9], ["Lenticchie rosse decorticate (secche)", "Legumi", 345, 24, 52, 2, 2.2, 0.3, 10.8, 48, 7.4], ["Cous cous (crudo)", "Cereali", 360, 12.8, 72.4, 0.5, 0.6, 0.1, 5, 24, 1.1], ["Orzo perlato (crudo)", "Cereali", 319, 10.4, 70.5, 0.8, 1.4, 0.3, 9.2, 29, 2.5], ["Passata di pomodoro", "Verdure", 21, 1.3, 3.5, 3.5, 0.2, 0, 1.5, 10, 0.9], ["Fette biscottate integrali", "Cereali", 410, 12, 70, 6, 7, 1.2, 9, 40, 2.5], ["Confettura extra di frutta", "Dolci e occasionali", 250, 0.4, 60, 55, 0.1, 0, 1, 15, 0.4], ["Miele", "Dolci e occasionali", 304, 0.3, 82, 82, 0, 0, 0.2, 6, 0.4], ["Cacao amaro in polvere", "Altro", 359, 19.6, 21, 1.8, 13.7, 8.1, 37, 128, 13.9], ["Semi di sesamo", "Frutta secca e semi", 573, 17.7, 11.7, 0.3, 49.7, 7, 11.8, 975, 14.6], ["Farina di ceci", "Legumi", 359, 22.4, 47, 10.9, 6.7, 0.7, 10.8, 45, 4.9], ["Farina di frumento tipo 0", "Cereali", 343, 11.5, 72, 1.7, 1, 0.2, 2.9, 17, 0.9], ["Farina integrale di frumento", "Cereali", 319, 12, 61, 2, 1.9, 0.3, 9, 28, 3], ["Pane grattugiato", "Cereali", 380, 12, 74, 4, 3.5, 0.8, 4, 40, 2]];
+const SRC = {"Pasta di semola (cruda)": "000800", "Pasta integrale (cruda)": "000850", "Riso integrale (crudo)": "000110", "Farro (crudo)": "000020", "Quinoa (cruda)": "000096", "Fiocchi d'avena": "003030", "Pane comune": "000560", "Pane integrale": "000550", "Lenticchie secche": "004500", "Ceci secchi": "004000", "Ceci in scatola (sgocciolati)": "004010", "Fagioli in scatola (sgocciolati)": "004130", "Uova intere": "181100", "Latte parzialmente scremato": "135020", "Yogurt bianco intero": "150010", "Pomodori": "006610", "Mandorle": "008540", "Lenticchie al vapore": "004500 ÷ 2,5"};
+const MODULES = {"Colazione": {"kcal": 406.6, "prot": 15.2, "Ca": 350, "Fe": 2.5, "sugCap": 30.5}, "Spuntino": {"kcal": 101.7, "sugCap": 10}, "Pranzo": {"kcal": 711.6, "prot": 26.7, "Ca": 250, "Fe": 6.5, "sugCap": 9.5}, "Merenda": {"kcal": 203.3, "prot": 7.6, "Ca": 200, "Fe": 1.2, "sugCap": 13}, "Cena": {"kcal": 610.0, "prot": 22.9, "Ca": 250, "Fe": 5.5, "sugCap": 11}, "Cena con carne": {"kcal": 610.0, "Ca": 250, "Fe": 5.5, "sugCap": 11}};
 const FOOD = new Map(DB.map(f=>[f[0].toLowerCase(),f]));
 const N = {kcal:0,prot:1,carb:2,sug:3,fat:4,sat:5,fib:6,Ca:7,Fe:8};
 const $=s=>document.querySelector(s);
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const DEFAULT_MODEL="gemini-flash-latest", FALLBACK_MODEL="gemini-2.5-flash";
-let meal=LS.get("meal","Pranzo"), photos=[], busy=false, src="foto";
+let meal=LS.get("meal","Pranzo"), photos=[], busy=false, src="testo";
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{src=b.dataset.src;document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("hidden",p.dataset.pane!==src));});
 
 function veg(){return $("#veg").checked;}
 function season(){const m=new Date().getMonth()+1;return m>=3&&m<=5?"P":m>=6&&m<=8?"E":m>=9&&m<=11?"A":"I";}
 // ---------- meals
-function renderMeals(){const box=$("#meals");box.innerHTML="";Object.keys(MODULES).forEach(k=>{const b=document.createElement("button");b.textContent=k;b.setAttribute("aria-pressed",String(meal===k));b.onclick=()=>{meal=k;LS.set("meal",k);$("#veg").checked=(k!=="Cena con carne");renderMeals();};box.appendChild(b);});}
+const ICONS={"Colazione":"🥣","Spuntino":"🍎","Pranzo":"🍝","Merenda":"🥪","Cena":"🍲","Cena con carne":"🍗"};
+function renderMeals(){const box=$("#meals");box.innerHTML="";$("#mealname").textContent=meal;Object.keys(MODULES).forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=ICONS[k]||k;b.title=k;b.setAttribute("aria-label",k);b.setAttribute("aria-pressed",String(meal===k));b.onclick=()=>{meal=k;LS.set("meal",k);$("#veg").checked=(k!=="Cena con carne");renderMeals();};box.appendChild(b);});}
 // ---------- setup
 function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);}}
 $("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
@@ -171,6 +199,7 @@ Regole:
 - Segna "trascurabile": true per sale, pepe, spezie, erbe, aglio, scorza o succo di limone, aceto, lievito, brodo, acqua e quantità minime: non serve l'alimento.
 - Ingredienti NON ammessi da sostituire con un'alternativa simile e semplice: funghi, avocado, mango, pesce e frutti di mare, Parmigiano, Grana, pecorino, gorgonzola, fontina, provolone, feta, mozzarella di bufala (usa "Formaggio duro a caglio vegetale (tipo Gran Kinara)" o "Mozzarella vaccina" o "Ricotta vaccina"). ${veg()?"Versione latto-ovo-vegetariana: sostituisci carne, salumi, pesce, frutti di mare, brodo di carne, strutto e gelatina animale con alternative vegetariane semplici (legumi, uova, formaggi ammessi, tofu, brodo vegetale) mantenendo il carattere del piatto.":"La carne è ammessa (manzo, pollo, maiale); salumi e pesce vanno sostituiti."} Elenca ogni cambio in "sostituzioni" con frasi brevi (es. "Parmigiano → formaggio a caglio vegetale").
 - "porzioni": per quante persone è la ricetta originale (se non è scritto, stimalo).
+- Possono esserci delle NOTE della ragazza: rispettale. Se scrive che qualcosa non le piace o non lo vuole, toglilo o sostituiscilo con un'alternativa semplice e indicalo in "sostituzioni". Se scrive che nello stesso pasto mangerà anche altri cibi (es. "mangerò anche una mela"), NON metterli tra gli ingredienti: elencali in "extra" con nome, alimento dall'elenco e grammi stimati (1 mela o 1 pera = 150 g, 1 banana = 120 g, 1 fetta di pane = 50 g, 1 yogurt = 125 g, 1 bicchiere di latte = 200 g, 1 formaggino = 20 g).
 - "da_dividere": true se è una preparazione che si fa comunque intera e poi si divide (torte, crostate, plumcake, biscotti, muffin, pane, focacce, pizze in teglia, lasagne o sformati al forno); in quel caso "unita" è come si divide al plurale ("fette", "biscotti", "quadrotti") e il procedimento resta per la ricetta intera.
 - "procedimento": passi brevi e chiari per preparare UNA porzione (o la ricetta intera se da_dividere), con parole semplici per una ragazza che cucina da sola. NON scrivere quantità né grammi (scrivi "aggiungi la farina", non "aggiungi 200 g di farina"); tempi e temperature vanno bene. Usa gli ingredienti sostituiti.
 - "titolo": nome della ricetta in italiano. Se il testo non è una ricetta, metti "non_ricetta": true.
@@ -180,7 +209,7 @@ ${allowed}`;
 const SCHEMA={type:"OBJECT",properties:{
   non_ricetta:{type:"BOOLEAN"},titolo:{type:"STRING"},porzioni:{type:"NUMBER"},da_dividere:{type:"BOOLEAN"},unita:{type:"STRING"},
   ingredienti:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"},trascurabile:{type:"BOOLEAN"}},required:["nome","grammi","trascurabile"]}},
-  sostituzioni:{type:"ARRAY",items:{type:"STRING"}},procedimento:{type:"ARRAY",items:{type:"STRING"}},tempo:{type:"STRING"}},
+  sostituzioni:{type:"ARRAY",items:{type:"STRING"}},extra:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},alimento:{type:"STRING"},grammi:{type:"NUMBER"}},required:["nome","grammi"]}},procedimento:{type:"ARRAY",items:{type:"STRING"}},tempo:{type:"STRING"}},
   required:["titolo","porzioni","ingredienti","procedimento"]};
 async function gemini(parts,opt={}){
   const key=LS.get("key",""); if(!key){showSetup(true);throw {friendly:"Prima serve la chiave: chiedi ai tuoi genitori di inserirla."};}
@@ -234,14 +263,15 @@ function plan(rec){
   const base=nut(core.map(i=>[i.alimento,i.grammi/por]));
   if(base.kcal<5) return null;
   const div=!!rec.da_dividere;
-  const lo=0.4, hi=div?3:1.4;
+  const lo=0.4, hi=div?3:1.25;
   const keys=["prot","Ca","Fe"].filter(k=>T[k]);
   const pool=accList(meal); let chosen=[];
+  const fixed=(rec.extra||[]).filter(e=>e&&e.alimento&&FOOD.has(String(e.alimento).toLowerCase())&&e.grammi>0).map(e=>{const a={id:"extra",items:[[e.alimento,e.grammi]],txt:`${e.nome} (come hai scritto tu)`};a.n=nut(a.items);return a;});
   const scaleFor=accK=>Math.min(hi,Math.max(lo,(T.kcal-accK)/base.kcal));
-  const kc=acc=>acc.reduce((a,x)=>a+x.n.kcal,0);
-  const total=(acc)=>{const s=scaleFor(kc(acc));const t={};for(const k in N)t[k]=base[k]*s+acc.reduce((a,x)=>a+x.n[k],0);return t;};
+  const kc=acc=>acc.concat(fixed).reduce((a,x)=>a+x.n.kcal,0);
+  const total=(acc)=>{const s=scaleFor(kc(acc));const t={};for(const k in N)t[k]=base[k]*s+acc.concat(fixed).reduce((a,x)=>a+x.n[k],0);return t;};
   const deficit=t=>keys.reduce((a,k)=>a+Math.max(0,0.9*T[k]-t[k])/T[k],0);
-  for(let round=0;round<2;round++){
+  for(let round=0;round<1;round++){
     const cur=total(chosen); const d=deficit(cur); if(d<0.08) break;
     let best=null,bestGain=0;
     for(const a of pool){ if(chosen.includes(a)) continue;
@@ -252,9 +282,9 @@ function plan(rec){
     if(!best) break; chosen.push(best);
   }
   // energy still short (light recipe): add simple foods instead of making the dish huge
-  const fillers=meal==="Spuntino"?["frutto","mandorle"]:meal==="Colazione"||meal==="Merenda"?["pane","frutto","yogurt","latte"]:["pane","pane2","frutto","yogurt"];
+  const fillers=meal==="Spuntino"?["frutto","mandorle"]:meal==="Colazione"||meal==="Merenda"?["pane","frutto","yogurt","latte"]:["pane","frutto","yogurt"];
   for(const id of fillers){
-    if(total(chosen).kcal>=T.kcal*0.9||chosen.length>=4) break;
+    if(total(chosen).kcal>=T.kcal*0.85||chosen.length>=2) break;
     if(id==="pane2"){const i=chosen.findIndex(a=>a.id==="pane"); if(i>=0){const p2={id:"pane2",items:[["Pane integrale",100]],txt:"2 fette di pane integrale"};p2.n=nut(p2.items);chosen[i]=p2;} continue;}
     const a=pool.find(x=>x.id===id); if(!a||chosen.find(x=>x.id===id)) continue;
     if(id==="frutto"&&total(chosen).sug+a.n.sug>T.sugCap) continue;
@@ -262,7 +292,7 @@ function plan(rec){
   }
   const s=scaleFor(kc(chosen)); const t=total(chosen);
   const slices=div?Math.max(1,Math.min(24,Math.round(por/s))):null;
-  return {scale:s/por, div, slices, unit:rec.unita||"fette", acc:chosen, rich:t.sug>T.sugCap*1.3, check:t};
+  return {scale:s/por, div, slices, unit:rec.unita||"fette", acc:fixed.concat(chosen), rich:t.sug>T.sugCap*1.3, check:t};
 }
 // friendly quantities
 function qty(i,f){
@@ -288,6 +318,7 @@ $("#go").onclick=async()=>{
     const parts=[{text:promptText()}];
     if(src==="foto") photos.forEach(p=>parts.push({inline_data:{mime_type:"image/jpeg",data:p.data}}));
     if(src==="testo") parts.push({text:"Testo:\n"+text});
+    const notes=$("#notes").value.trim(); if(notes) parts.push({text:"NOTE della ragazza:\n"+notes});
     if(src==="link"){ const t=await pageText(url); if(/NESSUNA RICETTA/.test(t)&&t.length<200) throw {friendly:"In questa pagina non ho trovato una ricetta."}; parts.push({text:"Testo della ricetta (da "+url+"):\n"+t}); $("#status").textContent="Preparo la tua porzione…"; }
     const rec=await gemini(parts);
     if(rec.non_ricetta||!Array.isArray(rec.ingredienti)||!rec.ingredienti.length) throw {friendly:"Non ho trovato una ricetta: prova con un'altra foto, un altro testo o un'altra pagina."};
@@ -318,7 +349,7 @@ function showResult(v,fresh){
   r.classList.remove("hidden"); r.scrollIntoView({behavior:"smooth",block:"start"});
   if(fresh) $("#save").onclick=()=>{const s=LS.get("saved",[]);s.unshift(v);LS.set("saved",s.slice(0,40));$("#save").textContent="Salvata";$("#save").disabled=true;renderSaved();};
   $("#share").onclick=()=>shareText(v.titolo,plain(v),$("#share"));
-  $("#again").onclick=()=>{photos=[];renderThumbs();$("#text").value="";$("#url").value="";r.classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"});};
+  $("#again").onclick=()=>{photos=[];renderThumbs();$("#text").value="";$("#url").value="";$("#notes").value="";r.classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"});};
 }
 function plain(v){
   return [v.titolo, `Per: ${v.pasto.toLowerCase()}${v.tempo?" - "+v.tempo:""}`, "",
@@ -361,7 +392,64 @@ function renderSaved(){
     li.querySelector(".del").onclick=()=>{const a=LS.get("saved",[]);a.splice(i,1);LS.set("saved",a);renderSaved();};ul.appendChild(li);});
 }
 $("#veg").checked=(meal!=="Cena con carne");
-renderMeals(); renderSaved(); if(!LS.get("key","")) showSetup(true);
+// ---------- idea di oggi (fonti istituzionali / peer review)
+const FONTI={
+ crea:{t:"CREA, Linee guida per una sana alimentazione (2018)",u:"https://www.epicentro.iss.it/alimentazione/linee-guida-sana-alimentazione-crea-2018"},
+ rossi:{t:"Rossi et al., Frontiers in Nutrition 2022 (revisione 2018 delle linee guida italiane)",u:"https://doi.org/10.3389/fnut.2022.861526"},
+ oms:{t:"OMS, Healthy diet – scheda informativa",u:"https://www.who.int/news-room/fact-sheets/detail/healthy-diet"},
+ omsPA:{t:"OMS, Linee guida su attività fisica e comportamenti sedentari (2020)",u:"https://www.who.int/publications/i/item/9789240015128"},
+ sinu:{t:"SINU, documento di consenso sulle diete vegetariane (Agnoli et al. 2017)",u:"https://doi.org/10.1016/j.numecd.2017.10.020"},
+ larn:{t:"SINU, LARN – Livelli di assunzione di riferimento (IV revisione, 2014)",u:""}};
+const TIPS=[
+ ["Variare spesso gli alimenti è il modo più semplice per prendere tutti i nutrienti: nessun cibo da solo li contiene tutti.","crea"],
+ ["Alterna i cereali durante la settimana: pasta, riso, orzo, farro, miglio, grano saraceno, pane. Spesso integrali.","crea"],
+ ["I legumi sono un ottimo secondo piatto: lenticchie, ceci, fagioli, piselli e fave, a rotazione durante la settimana.","crea"],
+ ["Cereali integrali e legumi portano fibre, che aiutano a sentirsi sazi più a lungo.","crea"],
+ ["Circa cinque porzioni al giorno tra frutta e verdura sono un buon obiettivo.","oms"],
+ ["Frutta e verdura di stagione hanno più gusto e cambiano ogni mese: così la varietà viene da sé.","crea"],
+ ["Bevi acqua durante tutta la giornata, senza aspettare di avere sete: la borraccia nello zaino aiuta.","crea"],
+ ["Le bevande zuccherate fanno prendere zuccheri senza accorgersene: l'acqua è la scelta migliore.","oms"],
+ ["I dolci non sono vietati: vanno bene, nei giusti limiti.","crea"],
+ ["A 15 anni il bisogno di calcio è il più alto di tutta la vita: latte, yogurt, formaggi, verdure a foglia verde e acqua ricca di calcio aiutano le ossa.","larn"],
+ ["Il ferro di legumi e verdure si assorbe meglio se nello stesso pasto c'è vitamina C: limone, arancia, kiwi, peperoni.","sinu"],
+ ["Tè e caffè riducono l'assorbimento del ferro: meglio berli lontano dai pasti.","sinu"],
+ ["Per condire scegli l'olio extravergine d'oliva, in piccole quantità.","crea"],
+ ["Una piccola manciata di frutta secca è uno spuntino pratico e nutriente.","crea"],
+ ["Poco sale, e iodato: erbe aromatiche, spezie e limone danno sapore.","crea"],
+ ["Fare colazione ogni giorno aiuta ad affrontare la mattina a scuola.","crea"],
+ ["Per i ragazzi è consigliato muoversi in media almeno un'ora al giorno: camminata veloce, bici, ballo, sport con gli amici.","omsPA"],
+ ["Ogni movimento conta: le scale, andare a scuola a piedi, una passeggiata. E un po' meno tempo seduti davanti agli schermi.","omsPA"],
+ ["Prodotti di stagione e del territorio sono una scelta buona anche per l'ambiente.","crea"],
+ ["Le linee guida italiane si ispirano alla dieta mediterranea: tanti vegetali, cereali, legumi e olio d'oliva.","rossi"]];
+const WEEK={cereali:["orzo","farro","miglio","grano saraceno","riso integrale","quinoa","fiocchi d'avena","cous cous"],
+ legumi:["lenticchie","ceci","fagioli borlotti","cannellini","piselli","lenticchie rosse"],
+ verdura:{P:["asparagi","carciofi","piselli freschi","spinaci","fave fresche"],E:["zucchine","peperoni","melanzane","fagiolini","pomodori"],A:["zucca","broccoli","cavolfiore","cavolo nero","verza","porri"],I:["cime di rapa","finocchi","carciofi","cavolini di Bruxelles","radicchio"]},
+ frutta:{P:["fragole","ciliegie","arance","kiwi"],E:["pesche","albicocche","melone","anguria","susine"],A:["uva","pere","cachi","melagrana","mele"],I:["arance","mandarini","kiwi","pompelmo","pere"]}};
+function dayNum(){const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/86400000);}
+function todayKey(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+async function renderTip(){
+  const n=dayNum(), [txt,src]=TIPS[(n*7)%TIPS.length], f=FONTI[src];
+  $("#tiptext").textContent=txt;
+  $("#tipsrc").innerHTML="Fonte: "+(f.u?`<a href="${f.u}" target="_blank" rel="noopener">${esc(f.t)}</a>`:esc(f.t));
+  const cached=LS.get("tip",null);
+  if(cached&&cached.day===todayKey()&&cached.base===txt){$("#tiptext").textContent=cached.text;return;}
+  if(!LS.get("key","")) return;
+  try{
+    const out=await gemini([{text:`Riscrivi questo messaggio per una ragazza di 15 anni, con parole tue, tono amichevole e positivo, in una o due frasi brevi. Non aggiungere informazioni, numeri, consigli o fonti nuove e non togliere il senso. Non parlare di peso, calorie, diete o aspetto fisico. Rispondi solo con il testo.\nMessaggio: «${txt}»`}],{plain:true});
+    const t=String(out||"").trim().replace(/^["«]|["»]$/g,"");
+    if(t&&t.length<320&&!/\b(kg|kcal|calori|peso|dieta|dimagr)/i.test(t)){ $("#tiptext").textContent=t; LS.set("tip",{day:todayKey(),base:txt,text:t}); }
+  }catch(e){}
+}
+function renderWeek(){
+  const w=Math.floor(dayNum()/7), s=season();
+  const pick=(arr,o)=>arr[(w+o)%arr.length];
+  const items=[pick(WEEK.cereali,0),pick(WEEK.legumi,3),pick(WEEK.verdura[s],1),pick(WEEK.frutta[s],2)];
+  const box=$("#weekchips"); box.innerHTML="";
+  items.forEach(it=>{const b=document.createElement("button");b.type="button";b.textContent=it;
+    b.onclick=()=>{document.querySelector('.tabs button[data-src="testo"]').click();$("#text").value=`Un piatto semplice con ${it}`;$("#text").scrollIntoView({behavior:"smooth",block:"center"});};
+    box.appendChild(b);});
+}
+renderMeals(); renderSaved(); renderWeek(); renderTip(); if(!LS.get("key","")) showSetup(true);
 </script>
 </body>
 </html>

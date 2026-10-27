@@ -21,6 +21,10 @@ In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apr
 
 ## Come si usa
 
+- **Pasto**: si sceglie toccando un'icona (🥣 colazione, 🍎 spuntino, 🍝 pranzo, 🥪 merenda, 🍲 cena, 🍗 cena con carne); il nome compare sotto.
+- **Note per me** (sempre disponibili, con qualsiasi fonte): per esempio "mangerò anche una mela" (viene conteggiata e la porzione si adatta) o "non mi piace l'aglio" (l'ingrediente viene tolto o sostituito).
+
+- **Testo** (prima scelta): una ricetta incollata oppure un'idea scritta al momento.
 - **Foto**: una o più pagine della ricetta (fotocamera o galleria).
 - **Testo**: una ricetta incollata, oppure un'idea scritta al momento ("pasta e piselli come la fa la nonna"): l'app crea una ricetta semplice.
 - **Pagina web**: incolla il link della ricetta. L'app chiede a Gemini di leggere la pagina; se non ci riesce prova con il servizio gratuito r.jina.ai (che riceve solo l'indirizzo della pagina). Se nessuno dei due funziona, copia il testo e usa la scheda Testo.
@@ -31,5 +35,7 @@ In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apr
 
 - Il piano gratuito di Gemini usa i dati inviati per migliorare i prodotti Google: non fotografare documenti con dati personali.
 - Il modello predefinito è `gemini-flash-latest`; se Google lo cambia, si modifica dalla rotellina in alto (campo Modello).
-- I dati nutrizionali e gli obiettivi dei pasti sono quelli del file Excel (ragazza, 15 anni, 60 kg, attività sedentaria, 2169 kcal/giorno). Se il profilo cambia, l'app va rigenerata.
+- Obiettivi: circa 2030 kcal/giorno (ragazza di 15 anni, 1,62 m, peso di riferimento 53 kg = mediana OMS per altezza ed età, attività sedentaria), ripartiti 20/5/35/10/30 tra i pasti. Se il profilo cambia, l'app va rigenerata.
+- Valori nutrizionali: tabelle CREA (alimentinutrizione.it) per 17 alimenti principali; per gli altri, medie da tabelle CREA, BDA e USDA.
+- "Idea di oggi": un messaggio al giorno da una raccolta tratta da fonti istituzionali e peer review (Linee guida CREA 2018, OMS, SINU), riformulato da Gemini senza aggiungere contenuti. La fonte è sempre indicata. "Questa settimana prova" propone un cereale, un legume, una verdura e un frutto di stagione: toccandoli si prepara una ricetta con quell'ingrediente.
 - Le ricette salvate restano solo sul telefono.
