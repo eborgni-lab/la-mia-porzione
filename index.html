@@ -63,6 +63,22 @@ details.paste summary{cursor:pointer;color:var(--muted)}
 .saved button.open{flex:1;text-align:left;font:inherit;background:transparent;border:0;color:var(--ink);padding:12px 2px;cursor:pointer}
 .saved button.del{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;padding:8px}
 .hidden{display:none!important}
+.nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 16px}
+.nav button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 4px;cursor:pointer}
+.nav button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.shopcat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px 14px 8px;margin-top:12px}
+.shopcat h3{font-size:16px;margin:8px 0 4px;color:var(--accent)}
+.item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.item .q{color:var(--muted);font-size:15px;white-space:nowrap;margin-left:auto;padding-left:8px}
+.item small{display:block;color:var(--muted);font-size:13px}
+.item.done span{text-decoration:line-through;color:var(--muted)}
+.dchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.dchips span{display:inline-flex;align-items:center;gap:4px;background:var(--soft);border-radius:999px;padding:5px 6px 5px 12px;font-size:15px}
+.dchips button{border:0;background:transparent;color:var(--muted);font-size:17px;cursor:pointer;padding:0 6px}
+.rowin{display:flex;gap:8px}
+.rowin input{flex:1}
 .tip{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:4px 0 16px}
 .tip .lab{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
 .tip p{margin:6px 0 6px;font-size:17px}
@@ -90,7 +106,7 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione<span class="ver">v6</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v7</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
@@ -102,9 +118,14 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
     <button class="btn ghost" id="testkey" type="button" style="width:100%;margin-bottom:10px">Prova la connessione</button>
     <div id="testout" class="datanote" aria-live="polite"></div>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
-    <p class="datanote">Versione 6. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
+    <p class="datanote">Versione 7. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
+  <nav class="nav" id="nav" aria-label="Sezioni">
+    <button type="button" data-view="main" aria-pressed="true">🍽️ Ricetta</button>
+    <button type="button" data-view="shop" aria-pressed="false">🛒 Spesa</button>
+    <button type="button" data-view="nope" aria-pressed="false">🚫 Non mi piace</button>
+  </nav>
   <section id="main">
     <div class="tip" id="tip">
       <div class="lab">Idea di oggi</div>
@@ -152,6 +173,20 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
       <ul class="saved" id="saved"></ul>
     </section>
   </section>
+
+  <section id="shop" class="hidden">
+    <p class="lead">La lista della settimana: ingredienti vari e di stagione, nelle quantità giuste per te.</p>
+    <button class="btn go" id="makeshop" style="margin-top:0">Prepara la lista della settimana</button>
+    <div class="status" id="shopstatus" aria-live="polite"></div>
+    <div class="err hidden" id="shoperr"></div>
+    <div id="shoplist"></div>
+  </section>
+
+  <section id="nope" class="hidden">
+    <p class="lead">Gli alimenti che non ti piacciono non compariranno né nelle ricette né nella lista della spesa.</p>
+    <div class="rowin"><input type="text" id="nopein" placeholder="Per esempio: aglio, melanzane" autocapitalize="none"><button class="btn" id="nopeadd" type="button">Aggiungi</button></div>
+    <div class="dchips" id="nopelist"></div>
+  </section>
 </div>
 <script>
 const DB = [["Pasta di semola (cruda)", "Cereali", 341, 13.5, 72.7, 2.2, 1.2, 0.22, 1.7, 22, 1.4], ["Pasta integrale (cruda)", "Cereali", 330, 13.3, 64.8, 3.0, 2.2, 0.35, 7.1, 35, 2.7], ["Riso bianco (crudo)", "Cereali", 334, 6.7, 80.4, 0.2, 0.4, 0.1, 1, 24, 0.8], ["Riso integrale (crudo)", "Cereali", 341, 7.5, 77.4, 1.2, 1.9, 0.4, 1.9, 32, 1.6], ["Farro (crudo)", "Cereali", 353, 14.6, 69.3, 2.4, 2.4, 0.38, 6.5, 35, 1.9], ["Quinoa (cruda)", "Cereali", 376, 15.4, 57.8, 5.3, 8.1, 2.45, 12.2, 46, 3.6], ["Fiocchi d'avena", "Cereali", 367, 8.0, 66.8, 0.6, 7.5, 1.29, 8.3, 54, 5.2], ["Pane comune", "Cereali", 275, 9.0, 57.6, 7.5, 1.9, 0.38, 3.1, 20, 1.0], ["Pane integrale", "Cereali", 224, 8.5, 44.1, 2, 1.3, 0.24, 6.5, 25, 2.5], ["Patate", "Tuberi", 85, 2.1, 18, 0.4, 0.1, 0, 1.6, 10, 0.6], ["Lenticchie secche", "Legumi", 291, 22.7, 51.1, 1.8, 1.0, 0.12, 13.8, 57, 8.0], ["Lenticchie al vapore", "Legumi", 116.4, 9.08, 20.44, 0.72, 0.4, 0.05, 5.52, 22.8, 3.2], ["Ceci secchi", "Legumi", 343, 20.9, 46.9, 3.7, 6.3, 0.77, 13.6, 142, 6.4], ["Fagioli borlotti secchi", "Legumi", 291, 20.2, 47.5, 2.5, 2, 0.3, 17.3, 102, 9], ["Ceci in scatola (sgocciolati)", "Legumi", 111, 6.7, 13.9, 1, 2.3, 0.29, 5.7, 43, 1.8], ["Fagioli in scatola (sgocciolati)", "Legumi", 102, 6.7, 15.9, 1, 0.5, 0.1, 5.5, 31, 2.2], ["Piselli surgelati", "Legumi", 71, 5.5, 9, 4, 0.4, 0.1, 5, 25, 1.5], ["Tofu (coagulato con calcio)", "Derivati soia", 120, 13, 1.5, 0.5, 7, 1, 1, 350, 2.5], ["Tempeh", "Derivati soia", 192, 20.3, 6, 0, 10.8, 2.2, 4, 111, 2.7], ["Seitan", "Proteici vegetali", 121, 22, 4, 0.5, 2, 0.3, 0.6, 40, 1.5], ["Bevanda di soia arricchita (no zuccheri)", "Bevande vegetali", 33, 3.3, 0.7, 0.3, 1.8, 0.3, 0.6, 120, 0.4], ["Uova intere", "Uova", 128, 12.4, 0, 0, 8.7, 3.57, 0, 48, 1.5], ["Latte parzialmente scremato", "Latte e derivati", 46, 3.5, 5.0, 5.0, 1.5, 0.84, 0, 120, 0.1], ["Yogurt bianco intero", "Latte e derivati", 66, 3.8, 4.3, 4.3, 3.9, 2.39, 0, 125, 0.1], ["Yogurt greco 0%", "Latte e derivati", 59, 10.2, 3.6, 3.2, 0.4, 0.1, 0, 110, 0.1], ["Fiocchi di latte", "Latte e derivati", 98, 11.1, 3.4, 2.7, 4.3, 1.7, 0, 83, 0.1], ["Ricotta vaccina", "Latte e derivati", 146, 8.8, 3.5, 3.5, 10.9, 7, 0, 295, 0.4], ["Mozzarella vaccina", "Latte e derivati", 253, 18.7, 0.7, 0.7, 19.5, 12, 0, 350, 0.2], ["Stracchino", "Latte e derivati", 300, 18.5, 0, 0, 25.1, 16, 0, 567, 0.3], ["Spinaci crudi", "Verdure", 31, 3.4, 2.9, 0.4, 0.7, 0.1, 1.9, 78, 2.9], ["Broccoli", "Verdure", 34, 2.8, 4, 1.7, 0.4, 0.1, 2.6, 47, 0.7], ["Cavolo nero", "Verdure", 42, 3.5, 3.5, 1, 0.9, 0.1, 3.6, 190, 1.5], ["Pomodori", "Verdure", 23, 1.0, 3.5, 3.5, 0.2, 0.0, 2.0, 9, 0.3], ["Zucchine", "Verdure", 17, 1.2, 2.2, 1.7, 0.3, 0.1, 1, 16, 0.4], ["Carote", "Verdure", 39, 1.1, 7.6, 7.6, 0.2, 0, 3.1, 44, 0.7], ["Peperoni rossi", "Verdure", 26, 0.9, 4.2, 4.2, 0.3, 0, 1.9, 17, 0.4], ["Lattuga", "Verdure", 19, 1.4, 2.2, 0.8, 0.2, 0, 1.5, 36, 0.9], ["Rucola", "Verdure", 25, 2.6, 2.1, 2, 0.7, 0.1, 1.6, 160, 1.5], ["Cime di rapa", "Verdure", 22, 2.9, 2, 0.4, 0.3, 0, 2.9, 97, 1.5], ["Cavolfiore", "Verdure", 25, 3.2, 2.7, 2.4, 0.2, 0, 2.4, 44, 0.6], ["Verza", "Verdure", 19, 2.1, 2.5, 2.3, 0.1, 0, 2.9, 35, 0.5], ["Cavolini di Bruxelles", "Verdure", 43, 4.2, 5.2, 2.2, 0.3, 0.1, 3.8, 42, 1.4], ["Finocchio", "Verdure", 13, 1.2, 1, 1, 0, 0, 2.2, 45, 0.2], ["Radicchio rosso", "Verdure", 13, 1.4, 1.6, 1.6, 0.1, 0, 3, 36, 0.3], ["Zucca gialla", "Verdure", 18, 1.1, 3.5, 2.5, 0.1, 0, 2, 20, 0.9], ["Carciofi", "Verdure", 33, 2.7, 2.5, 1, 0.2, 0, 5.5, 86, 1], ["Porri", "Verdure", 29, 2.1, 5.2, 3.9, 0.1, 0, 2.9, 59, 1.1], ["Bietola", "Verdure", 17, 1.3, 2.8, 1.1, 0.2, 0, 1.2, 70, 1.5], ["Asparagi", "Verdure", 29, 3.6, 3.3, 1.9, 0.2, 0, 2.1, 24, 0.7], ["Fave fresche", "Legumi", 41, 5.2, 4.5, 1, 0.4, 0.1, 5, 22, 1.5], ["Melanzane", "Verdure", 20, 1.1, 2.6, 2.6, 0.1, 0, 2.6, 14, 0.3], ["Fagiolini", "Verdure", 24, 2.1, 2.4, 2, 0.1, 0, 2.9, 35, 0.9], ["Cetrioli", "Verdure", 12, 0.7, 1.8, 1.8, 0.1, 0, 0.8, 16, 0.3], ["Cipolla", "Verdure", 26, 1, 5.7, 5.7, 0.1, 0, 1, 25, 0.4], ["Mela", "Frutta", 53, 0.3, 11.4, 10.4, 0.2, 0, 2.4, 6, 0.1], ["Banana", "Frutta", 91, 1.1, 20.2, 12.2, 0.3, 0.1, 2.6, 5, 0.3], ["Arancia", "Frutta", 47, 0.9, 9.4, 9.4, 0.1, 0, 2.4, 40, 0.1], ["Kiwi", "Frutta", 61, 1.1, 11.7, 9, 0.5, 0, 3, 34, 0.3], ["Fragole", "Frutta", 32, 0.7, 5.7, 4.9, 0.3, 0, 2, 16, 0.4], ["Mandarini", "Frutta", 53, 0.8, 11.5, 10.6, 0.3, 0, 1.8, 37, 0.2], ["Pompelmo", "Frutta", 29, 0.6, 6.2, 6.2, 0.1, 0, 1.6, 17, 0.1], ["Ciliegie", "Frutta", 38, 0.8, 9, 9, 0.1, 0, 1.3, 16, 0.4], ["Albicocche", "Frutta", 32, 0.4, 6.8, 6.8, 0.1, 0, 1.5, 16, 0.5], ["Pesche", "Frutta", 35, 0.8, 8, 8, 0.1, 0, 1.6, 6, 0.4], ["Susine", "Frutta", 46, 0.5, 10.5, 10.5, 0.1, 0, 1.5, 13, 0.2], ["Anguria", "Frutta", 17, 0.4, 3.7, 3.7, 0, 0, 0.2, 7, 0.2], ["Melone", "Frutta", 33, 0.8, 7.4, 7.4, 0.2, 0, 0.7, 9, 0.3], ["Fichi", "Frutta", 52, 0.9, 11.2, 11.2, 0.2, 0, 2, 43, 0.5], ["Mirtilli", "Frutta", 57, 0.7, 12.1, 10, 0.3, 0, 2.4, 6, 0.3], ["Uva", "Frutta", 64, 0.5, 15.6, 15.6, 0.1, 0, 1.5, 27, 0.4], ["Pere", "Frutta", 42, 0.3, 8.8, 8.8, 0.1, 0, 3.1, 6, 0.3], ["Cachi", "Frutta", 70, 0.6, 16, 16, 0.3, 0, 2.5, 8, 0.3], ["Melagrana", "Frutta", 80, 1.7, 14.7, 13.7, 1.2, 0.1, 4, 10, 0.3], ["Castagne fresche", "Frutta secca e semi", 180, 2.9, 36.7, 8.9, 1.7, 0.3, 4.7, 30, 0.9], ["Mandorle", "Frutta secca e semi", 628, 22.0, 4.6, 3.7, 55.3, 4.17, 12.7, 240, 3.0], ["Noci", "Frutta secca e semi", 689, 15.2, 7, 2.6, 65.2, 6.1, 6.7, 98, 2.9], ["Semi di zucca", "Frutta secca e semi", 593, 30.2, 4.7, 1.4, 49.1, 8.7, 6, 46, 8.8], ["Semi di lino", "Frutta secca e semi", 514, 18.3, 1.6, 1.6, 42.2, 3.7, 27.3, 255, 5.7], ["Tahina (crema di sesamo)", "Frutta secca e semi", 618, 17, 11.9, 0.5, 53.8, 7.5, 9.3, 426, 8.9], ["Burro di arachidi", "Frutta secca e semi", 610, 25, 12, 6, 50, 10, 6, 45, 1.9], ["Olio extravergine d'oliva", "Grassi", 899, 0, 0, 0, 99.9, 14.5, 0, 0, 0.6], ["Burro", "Grassi", 758, 0.8, 1.1, 1.1, 83.4, 51, 0, 24, 0.1], ["Manzo magro (crudo)", "Carne", 129, 21.3, 0, 0, 5, 2, 0, 4, 2], ["Petto di pollo (crudo)", "Carne", 100, 23.3, 0, 0, 0.8, 0.3, 0, 4, 0.4], ["Lonza di maiale (cruda)", "Carne", 146, 21, 0, 0, 6.8, 2.4, 0, 7, 0.8], ["Gelato alla crema / fior di latte", "Dolci e occasionali", 200, 3.5, 24, 21, 10, 6.5, 0.5, 120, 0.1], ["Gelato al cioccolato", "Dolci e occasionali", 230, 4, 26, 22, 12, 7.5, 1.5, 110, 0.9], ["Sorbetto / gelato alla frutta", "Dolci e occasionali", 130, 0.5, 31, 28, 0.2, 0, 0.5, 10, 0.2], ["Crostata di frutta / marmellata", "Dolci e occasionali", 380, 5.5, 60, 30, 13, 6.5, 1.8, 30, 1], ["Biscotti secchi", "Dolci e occasionali", 416, 6.6, 80, 22, 7.9, 2.5, 2.5, 30, 1.5], ["Cornetto / brioche", "Dolci e occasionali", 410, 7.5, 47, 15, 21, 11, 2, 30, 1], ["Pizza margherita", "Dolci e occasionali", 250, 10.5, 33, 2.5, 8, 3.5, 2, 180, 1.2], ["Cioccolato fondente 70%", "Altro", 572, 7.8, 34, 24, 42.6, 24.5, 10.9, 73, 11.9], ["Latte intero", "Latte e derivati", 64, 3.3, 4.9, 4.9, 3.6, 2.3, 0, 119, 0.1], ["Formaggino a caglio microbico (tipo Babybel)", "Latte e derivati", 306, 22, 0, 0, 24, 16, 0, 700, 0.2], ["Formaggio duro a caglio vegetale (tipo Gran Kinara)", "Latte e derivati", 390, 32, 0, 0, 28, 18, 0, 1100, 0.4], ["Crackers integrali", "Snack portatili", 430, 10, 65, 2, 13, 1.5, 7, 40, 2.5], ["Grissini", "Snack portatili", 410, 12, 70, 2.5, 9, 1.2, 3.5, 25, 1.4], ["Gallette di riso integrale", "Snack portatili", 380, 8, 78, 0.5, 3, 0.6, 4, 10, 1.5], ["Albicocche secche", "Snack portatili", 241, 3.4, 55, 53, 0.5, 0, 7.3, 55, 2.7], ["Fichi secchi", "Snack portatili", 249, 3.3, 54, 47.9, 0.9, 0.1, 9.8, 162, 2], ["Nocciole", "Frutta secca e semi", 628, 15, 7, 4.3, 60.8, 4.5, 9.7, 114, 4.7], ["Pistacchi (sgusciati)", "Frutta secca e semi", 560, 20, 16.6, 7.7, 45, 5.9, 10.6, 105, 3.9], ["Lenticchie rosse decorticate (secche)", "Legumi", 345, 24, 52, 2, 2.2, 0.3, 10.8, 48, 7.4], ["Cous cous (crudo)", "Cereali", 360, 12.8, 72.4, 0.5, 0.6, 0.1, 5, 24, 1.1], ["Orzo perlato (crudo)", "Cereali", 319, 10.4, 70.5, 0.8, 1.4, 0.3, 9.2, 29, 2.5], ["Passata di pomodoro", "Verdure", 21, 1.3, 3.5, 3.5, 0.2, 0, 1.5, 10, 0.9], ["Fette biscottate integrali", "Cereali", 410, 12, 70, 6, 7, 1.2, 9, 40, 2.5], ["Confettura extra di frutta", "Dolci e occasionali", 250, 0.4, 60, 55, 0.1, 0, 1, 15, 0.4], ["Miele", "Dolci e occasionali", 304, 0.3, 82, 82, 0, 0, 0.2, 6, 0.4], ["Cacao amaro in polvere", "Altro", 359, 19.6, 21, 1.8, 13.7, 8.1, 37, 128, 13.9], ["Semi di sesamo", "Frutta secca e semi", 573, 17.7, 11.7, 0.3, 49.7, 7, 11.8, 975, 14.6], ["Farina di ceci", "Legumi", 359, 22.4, 47, 10.9, 6.7, 0.7, 10.8, 45, 4.9], ["Farina di frumento tipo 0", "Cereali", 343, 11.5, 72, 1.7, 1, 0.2, 2.9, 17, 0.9], ["Farina integrale di frumento", "Cereali", 319, 12, 61, 2, 1.9, 0.3, 9, 28, 3], ["Pane grattugiato", "Cereali", 380, 12, 74, 4, 3.5, 0.8, 4, 40, 2]];
@@ -172,7 +207,16 @@ function season(){const m=new Date().getMonth()+1;return m>=3&&m<=5?"P":m>=6&&m<
 const ICONS={"Colazione":"🥣","Spuntino":"🍎","Pranzo":"🍝","Merenda":"🥪","Cena":"🍲","Cena con carne":"🍗"};
 function renderMeals(){const box=$("#meals");box.innerHTML="";$("#mealname").textContent=meal;Object.keys(MODULES).forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=ICONS[k]||k;b.title=k;b.setAttribute("aria-label",k);b.setAttribute("aria-pressed",String(meal===k));b.onclick=()=>{meal=k;LS.set("meal",k);$("#veg").checked=(k!=="Cena con carne");renderMeals();};box.appendChild(b);});}
 // ---------- setup
-function showSetup(v){$("#setup").classList.toggle("hidden",!v);$("#main").classList.toggle("hidden",v);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);$("#fast").checked=!!LS.get("fast",false);const lr=LS.get("lastRun",null);$("#testout").textContent=lr?`Ultima richiesta: ${lr.sec} secondi con ${lr.model} (${lr.when}).`:"";}}
+let view="main";
+function showView(v){view=v;["main","shop","nope"].forEach(id=>$("#"+id).classList.toggle("hidden",id!==v));document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));$("#nav").classList.remove("hidden");window.scrollTo({top:0});}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+function dislikes(){return LS.get("dislikes",[]);}
+function renderNope(){const box=$("#nopelist");box.innerHTML="";const d=dislikes();
+  if(!d.length){box.innerHTML='<p class="note">Nessun alimento escluso.</p>';return;}
+  d.forEach((x,i)=>{const s=document.createElement("span");s.innerHTML=`${esc(x)}<button aria-label="Togli ${esc(x)}">×</button>`;s.querySelector("button").onclick=()=>{const a=dislikes();a.splice(i,1);LS.set("dislikes",a);renderNope();renderWeek();};box.appendChild(s);});}
+$("#nopeadd").onclick=()=>{const v=$("#nopein").value.split(/[,;\n]/).map(s=>s.trim().toLowerCase()).filter(Boolean);if(!v.length)return;const a=dislikes();v.forEach(x=>{if(!a.includes(x))a.push(x);});LS.set("dislikes",a);$("#nopein").value="";renderNope();renderWeek();};
+$("#nopein").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#nopeadd").click();}});
+function showSetup(v){$("#setup").classList.toggle("hidden",!v);if(v){["main","shop","nope"].forEach(id=>$("#"+id).classList.add("hidden"));$("#nav").classList.add("hidden");}else showView(view);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);$("#fast").checked=!!LS.get("fast",false);const lr=LS.get("lastRun",null);$("#testout").textContent=lr?`Ultima richiesta: ${lr.sec} secondi con ${lr.model} (${lr.when}).`:"";}}
 $("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
 $("#closesetup").onclick=()=>showSetup(false);
 $("#testkey").onclick=async()=>{
@@ -213,7 +257,8 @@ Regole:
 - Segna "trascurabile": true per sale, pepe, spezie, erbe, aglio, scorza o succo di limone, aceto, lievito, brodo, acqua e quantità minime: non serve l'alimento.
 - Ingredienti NON ammessi da sostituire con un'alternativa simile e semplice: funghi, avocado, mango, pesce e frutti di mare, Parmigiano, Grana, pecorino, gorgonzola, fontina, provolone, feta, mozzarella di bufala (usa "Formaggio duro a caglio vegetale (tipo Gran Kinara)" o "Mozzarella vaccina" o "Ricotta vaccina"). ${veg()?"Versione latto-ovo-vegetariana: sostituisci carne, salumi, pesce, frutti di mare, brodo di carne, strutto e gelatina animale con alternative vegetariane semplici (legumi, uova, formaggi ammessi, tofu, brodo vegetale) mantenendo il carattere del piatto.":"La carne è ammessa (manzo, pollo, maiale); salumi e pesce vanno sostituiti."} Elenca ogni cambio in "sostituzioni" con frasi brevi (es. "Parmigiano → formaggio a caglio vegetale").
 - "porzioni": per quante persone è la ricetta originale (se non è scritto, stimalo).
-- Possono esserci delle NOTE della ragazza: rispettale. Se scrive che qualcosa non le piace o non lo vuole, toglilo o sostituiscilo con un'alternativa semplice e indicalo in "sostituzioni". Se scrive che nello stesso pasto mangerà anche altri cibi (es. "mangerò anche una mela"), NON metterli tra gli ingredienti: elencali in "extra" con nome, alimento dall'elenco e grammi stimati (1 mela o 1 pera = 150 g, 1 banana = 120 g, 1 fetta di pane = 50 g, 1 yogurt = 125 g, 1 bicchiere di latte = 200 g, 1 formaggino = 20 g).
+${dislikes().length?`- La ragazza NON gradisce: ${dislikes().join(", ")}. Non usarli mai: se sono nella ricetta toglili o sostituiscili con un'alternativa semplice e indicalo in "sostituzioni".
+`:""}- Possono esserci delle NOTE della ragazza: rispettale. Se scrive che qualcosa non le piace o non lo vuole, toglilo o sostituiscilo con un'alternativa semplice e indicalo in "sostituzioni". Se scrive che nello stesso pasto mangerà anche altri cibi (es. "mangerò anche una mela"), NON metterli tra gli ingredienti: elencali in "extra" con nome, alimento dall'elenco e grammi stimati (1 mela o 1 pera = 150 g, 1 banana = 120 g, 1 fetta di pane = 50 g, 1 yogurt = 125 g, 1 bicchiere di latte = 200 g, 1 formaggino = 20 g).
 - "da_dividere": true se è una preparazione che si fa comunque intera e poi si divide (torte, crostate, plumcake, biscotti, muffin, pane, focacce, pizze in teglia, lasagne o sformati al forno); in quel caso "unita" è come si divide al plurale ("fette", "biscotti", "quadrotti") e il procedimento resta per la ricetta intera.
 - "procedimento": passi brevi e chiari per preparare UNA porzione (o la ricetta intera se da_dividere), con parole semplici per una ragazza che cucina da sola. NON scrivere quantità né grammi (scrivi "aggiungi la farina", non "aggiungi 200 g di farina"); tempi e temperature vanno bene. Usa gli ingredienti sostituiti.
 - "titolo": nome della ricetta in italiano. Se il testo non è una ricetta, metti "non_ricetta": true.
@@ -253,7 +298,7 @@ async function resolveModel(key,force){
 async function gemini(parts,opt={}){
   const key=LS.get("key",""); if(!key){showSetup(true);throw {friendly:"Prima serve la chiave: chiedi ai tuoi genitori di inserirla."};}
   const body=opt.plain?{contents:[{role:"user",parts}],tools:opt.tools||undefined}
-                      :{contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json",responseSchema:SCHEMA}};
+                      :{contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json",responseSchema:opt.schema||SCHEMA}};
   let model;
   try{ model=await resolveModel(key,false); }
   catch(e){ if(e.friendly) throw e; if(e.status===400||e.status===401||e.status===403) throw {friendly:"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).",detail:`${e.status} – ${e.detail}`}; model="gemini-flash-latest"; }
@@ -500,12 +545,80 @@ async function renderTip(){
 function renderWeek(){
   const w=Math.floor(dayNum()/7), s=season();
   const pick=(arr,o)=>arr[(w+o)%arr.length];
-  const items=[pick(WEEK.cereali,0),pick(WEEK.legumi,3),pick(WEEK.verdura[s],1),pick(WEEK.frutta[s],2)];
+  const no=dislikes(); const ok=arr=>arr.filter(x=>!no.some(d=>x.includes(d)||d.includes(x)));
+  const pk=(arr,o)=>{const a=ok(arr);return a.length?a[(w+o)%a.length]:null;};
+  const items=[pk(WEEK.cereali,0),pk(WEEK.legumi,3),pk(WEEK.verdura[s],1),pk(WEEK.frutta[s],2)].filter(Boolean);
   const box=$("#weekchips"); box.innerHTML="";
   items.forEach(it=>{const b=document.createElement("button");b.type="button";b.textContent=it;
     b.onclick=()=>{document.querySelector('.tabs button[data-src="testo"]').click();$("#text").value=`Un piatto semplice con ${it}`;$("#text").scrollIntoView({behavior:"smooth",block:"center"});};
     box.appendChild(b);});
 }
+// ---------- lista della spesa
+const SHOP_SCHEMA={type:"OBJECT",properties:{
+  categorie:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},voci:{type:"ARRAY",items:{type:"OBJECT",properties:{nome:{type:"STRING"},quantita:{type:"STRING"},nota:{type:"STRING"}},required:["nome","quantita"]}}},required:["nome","voci"]}},
+  novita:{type:"ARRAY",items:{type:"STRING"}},idee:{type:"ARRAY",items:{type:"STRING"}}},required:["categorie","idee"]};
+const SNAMES={P:"primavera",E:"estate",A:"autunno",I:"inverno"};
+function shopPrompt(){
+  const mese=new Date().toLocaleDateString("it-IT",{month:"long"});
+  const prev=LS.get("shopHistory",[]).slice(0,2).flat();
+  return `Prepara la lista della spesa per UNA settimana per una sola persona: una ragazza di 15 anni, latto-ovo-vegetariana, che mangia carne una volta a settimana. Siamo in Italia, mese di ${mese} (${SNAMES[season()]}).
+Lo scopo è un'alimentazione varia, gustosa e di stagione, non un calcolo preciso delle ricette.
+Quantità indicative per una settimana (porzioni standard LARN e frequenze delle Linee guida CREA):
+- Cereali (pasta, riso, orzo, farro, miglio, grano saraceno, cous cous, quinoa…): circa 700 g in tutto, almeno 3 tipi diversi, spesso integrali. Non solo riso e quinoa.
+- Pane: circa 500 g, meglio integrale. Per colazione: fiocchi d'avena o fette biscottate, circa 250 g.
+- Legumi: 4 porzioni, almeno 2 tipi (secchi circa 50 g a porzione, oppure in scatola o al vapore circa 150 g a porzione).
+- Uova: 4. Tofu: facoltativo, 1 confezione.
+- Latte circa 1,5 litri e 7 yogurt bianchi.
+- Formaggi: 2–3 porzioni, solo senza caglio animale (ricotta, mozzarella vaccina a caglio microbico, stracchino, formaggio duro a caglio vegetale tipo Gran Kinara, formaggini a caglio microbico).
+- Carne: una sola porzione da 100–110 g (manzo, pollo o lonza di maiale), alternando nelle settimane.
+- Verdura: circa 3 kg, almeno 5 tipi diversi, solo di stagione in Italia nel mese indicato.
+- Frutta: 15–20 frutti, almeno 4 tipi diversi, solo di stagione.
+- Frutta secca o semi: circa 150 g.
+- Dispensa (solo se serve): olio extravergine d'oliva, passata di pomodoro, spezie ed erbe.
+Regole:
+- Escludi sempre pesce e frutti di mare, funghi, avocado, mango.${dislikes().length?`
+- La ragazza NON gradisce: ${dislikes().join(", ")}. Non inserirli in nessuna forma.`:""}${prev.length?`
+- Per variare, evita come alimenti principali quelli delle ultime settimane: ${prev.join(", ")}.`:""}
+- Quantità in formato pratico da supermercato (es. "1 kg", "2 confezioni da 400 g", "6 uova", "1 mazzo").
+- Raggruppa nelle categorie: Verdura, Frutta, Cereali e pane, Legumi, Latte, yogurt e uova, Formaggi, Carne, Frutta secca e semi, Dispensa.
+- In "nota" metti al massimo poche parole di suggerimento d'uso (es. "per una vellutata").
+- In "novita" indica 1 o 2 ingredienti nuovi da provare questa settimana, con una frase breve.
+- In "idee" scrivi 4–6 idee di piatti semplici e gustosi che usano questi ingredienti, una frase ciascuna.
+- Non parlare di calorie, peso o diete.`;
+}
+function renderShop(){
+  const st=LS.get("shop",null), box=$("#shoplist"); box.innerHTML="";
+  if(!st){return;}
+  const d=st.data; const chk=st.checked||{};
+  const head=document.createElement("p"); head.className="note"; head.textContent=`Lista del ${st.date}`; box.appendChild(head);
+  (d.categorie||[]).filter(c=>c.voci&&c.voci.length).forEach((c,ci)=>{
+    const sec=document.createElement("div"); sec.className="shopcat"; sec.innerHTML=`<h3>${esc(c.nome)}</h3>`;
+    c.voci.forEach((v,vi)=>{const id=ci+"-"+vi; const l=document.createElement("label"); l.className="item"+(chk[id]?" done":"");
+      l.innerHTML=`<input type="checkbox" ${chk[id]?"checked":""}><span>${esc(v.nome)}${v.nota?`<small>${esc(v.nota)}</small>`:""}</span><span class="q">${esc(v.quantita||"")}</span>`;
+      l.querySelector("input").onchange=e=>{const s=LS.get("shop",null); s.checked=s.checked||{}; s.checked[id]=e.target.checked; LS.set("shop",s); l.classList.toggle("done",e.target.checked);};
+      sec.appendChild(l);});
+    box.appendChild(sec);});
+  if(d.novita&&d.novita.length){const t=document.createElement("div");t.className="together";t.innerHTML=`<h4>Novità da provare</h4><ul>${d.novita.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;box.appendChild(t);}
+  if(d.idee&&d.idee.length){const t=document.createElement("div");t.className="shopcat";t.innerHTML=`<h3>Idee per la settimana</h3><ul style="margin:4px 0 8px;padding-left:20px">${d.idee.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;box.appendChild(t);}
+  const b=document.createElement("div"); b.className="big"; b.style.margin="14px 0";
+  b.innerHTML=`<button class="btn ghost grow" id="shopshare">Condividi la lista</button>`; box.appendChild(b);
+  $("#shopshare").onclick=()=>shareText("Lista della spesa",shopText(st),$("#shopshare"));
+  $("#makeshop").textContent="Prepara una nuova lista";
+}
+function shopText(st){const d=st.data;return [`Lista della spesa – ${st.date}`,"",...(d.categorie||[]).filter(c=>c.voci&&c.voci.length).flatMap(c=>[c.nome.toUpperCase(),...c.voci.map(v=>`- ${v.nome}${v.quantita?" – "+v.quantita:""}`),""]),...(d.idee&&d.idee.length?["Idee:",...d.idee.map(x=>"- "+x)]:[])].join("\n");}
+$("#makeshop").onclick=async()=>{
+  const btn=$("#makeshop"); if(btn.disabled) return; btn.disabled=true; $("#shoperr").classList.add("hidden"); $("#shopstatus").textContent="Preparo la lista…";
+  try{
+    const data=await gemini([{text:shopPrompt()}],{schema:SHOP_SCHEMA});
+    if(!data||!Array.isArray(data.categorie)) throw {friendly:"Non sono riuscita a preparare la lista: riprova."};
+    const no=dislikes(); data.categorie.forEach(c=>c.voci=(c.voci||[]).filter(v=>!no.some(d=>String(v.nome).toLowerCase().includes(d))));
+    const main=data.categorie.filter(c=>/verdur|frutta$|frutta |cereal|legum/i.test(c.nome)).flatMap(c=>c.voci.map(v=>v.nome)).slice(0,25);
+    const hist=LS.get("shopHistory",[]); hist.unshift(main); LS.set("shopHistory",hist.slice(0,3));
+    LS.set("shop",{date:new Date().toLocaleDateString("it-IT"),data,checked:{}}); renderShop();
+  }catch(e){ const er=$("#shoperr"); er.innerHTML=esc(e&&e.friendly?e.friendly:"Qualcosa non ha funzionato: riprova.")+(e&&e.detail?`<details style="margin-top:6px;font-size:13px"><summary>Dettagli tecnici</summary>${esc(e.detail)}</details>`:""); er.classList.remove("hidden"); }
+  finally{ btn.disabled=false; $("#shopstatus").textContent=""; }
+};
+renderNope(); renderShop();
 renderMeals(); renderSaved(); renderWeek(); renderTip(); if(!LS.get("key","")) showSetup(true);
 </script>
 </body>

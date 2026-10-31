@@ -36,6 +36,11 @@ In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apr
 - Il piano gratuito di Gemini usa i dati inviati per migliorare i prodotti Google: non fotografare documenti con dati personali.
 - Modello: con «auto» (consigliato) l'app chiede a Google quali modelli sono disponibili per la chiave e usa il Flash stabile più recente. Se un modello viene ritirato, passa da sola al successivo.
 
+## Spesa e alimenti non graditi
+
+- **🛒 Spesa**: "Prepara la lista della settimana" chiede a Gemini una lista per una persona, con verdura e frutta di stagione, almeno 3 cereali e 2 legumi diversi, latticini, uova, una porzione di carne, frutta secca. Le quantità sono indicative (porzioni standard LARN e frequenze delle Linee guida CREA). Ogni voce si spunta mentre si fa la spesa; "Condividi la lista" la manda a Note, Promemoria o WhatsApp. Ogni nuova lista evita di ripetere gli alimenti principali delle due settimane precedenti.
+- **🚫 Non mi piace**: gli alimenti inseriti qui non compaiono né nella lista della spesa né nelle ricette (vengono tolti o sostituiti).
+
 ## Composizione del piatto
 
 - A pranzo e a cena, se la ricetta contiene poca verdura, l'app aggiunge sempre un contorno di stagione (insalata, pomodori, broccoli o finocchi) prima di altri accompagnamenti.
