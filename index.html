@@ -106,19 +106,21 @@ button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-vi
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><h1>La mia porzione<span class="ver">v7</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
+  <div class="top"><h1>La mia porzione<span class="ver">v8</span></h1><button class="gear" id="gear" aria-label="Impostazioni">⚙︎</button></div>
 
   <section id="setup" class="setup hidden">
     <h2 style="margin-top:0">Impostazione (una volta sola)</h2>
     <p>Incolla la chiave di Google Gemini. Resta salvata solo su questo telefono.</p>
     <p><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Crea la chiave su Google AI Studio</a></p>
     <input type="password" id="key" placeholder="Chiave Gemini" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <p style="margin-top:14px"><b>Riserva (facoltativa)</b>: chiave OpenRouter, usata solo quando Gemini è sovraccarico o non risponde. <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">Crea la chiave su OpenRouter</a></p>
+    <input type="password" id="orkey" placeholder="Chiave OpenRouter (facoltativa)" autocomplete="off" autocapitalize="off" spellcheck="false">
     <p style="margin-top:12px"><label>Modello <input type="text" id="model" autocapitalize="off" spellcheck="false"></label><small style="display:block;color:var(--muted);margin-top:4px">Lascia «auto»: l'app sceglie da sola il modello Flash più recente disponibile.</small></p>
     <p><label><input type="checkbox" id="fast"> Modalità veloce (modello Flash-Lite: più rapido, un po' meno preciso nel leggere le foto)</label></p>
     <button class="btn ghost" id="testkey" type="button" style="width:100%;margin-bottom:10px">Prova la connessione</button>
     <div id="testout" class="datanote" aria-live="polite"></div>
     <div class="big"><button class="btn grow" id="savekey">Salva</button><button class="btn ghost" id="closesetup">Chiudi</button></div>
-    <p class="datanote">Versione 7. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
+    <p class="datanote">Versione 8. Dati nutrizionali: tabelle di composizione degli alimenti del CREA per gli alimenti principali (cereali, pane, legumi, latte, yogurt, uova, mandorle, pomodori); per gli altri valori medi da tabelle CREA, BDA e USDA. Porzioni calcolate su circa 2030 kcal al giorno (ragazza di 15 anni, peso di riferimento per altezza ed età, attività sedentaria).</p>
   </section>
 
   <nav class="nav" id="nav" aria-label="Sezioni">
@@ -216,19 +218,21 @@ function renderNope(){const box=$("#nopelist");box.innerHTML="";const d=dislikes
   d.forEach((x,i)=>{const s=document.createElement("span");s.innerHTML=`${esc(x)}<button aria-label="Togli ${esc(x)}">×</button>`;s.querySelector("button").onclick=()=>{const a=dislikes();a.splice(i,1);LS.set("dislikes",a);renderNope();renderWeek();};box.appendChild(s);});}
 $("#nopeadd").onclick=()=>{const v=$("#nopein").value.split(/[,;\n]/).map(s=>s.trim().toLowerCase()).filter(Boolean);if(!v.length)return;const a=dislikes();v.forEach(x=>{if(!a.includes(x))a.push(x);});LS.set("dislikes",a);$("#nopein").value="";renderNope();renderWeek();};
 $("#nopein").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#nopeadd").click();}});
-function showSetup(v){$("#setup").classList.toggle("hidden",!v);if(v){["main","shop","nope"].forEach(id=>$("#"+id).classList.add("hidden"));$("#nav").classList.add("hidden");}else showView(view);if(v){$("#key").value=LS.get("key","");$("#model").value=LS.get("model",DEFAULT_MODEL);$("#fast").checked=!!LS.get("fast",false);const lr=LS.get("lastRun",null);$("#testout").textContent=lr?`Ultima richiesta: ${lr.sec} secondi con ${lr.model} (${lr.when}).`:"";}}
+function showSetup(v){$("#setup").classList.toggle("hidden",!v);if(v){["main","shop","nope"].forEach(id=>$("#"+id).classList.add("hidden"));$("#nav").classList.add("hidden");}else showView(view);if(v){$("#key").value=LS.get("key","");$("#orkey").value=LS.get("orkey","");$("#model").value=LS.get("model",DEFAULT_MODEL);$("#fast").checked=!!LS.get("fast",false);const lr=LS.get("lastRun",null);$("#testout").textContent=lr?`Ultima richiesta: ${lr.sec} secondi con ${lr.model} (${lr.when}).`:"";}}
 $("#gear").onclick=()=>showSetup($("#setup").classList.contains("hidden"));
 $("#closesetup").onclick=()=>showSetup(false);
 $("#testkey").onclick=async()=>{
   const key=$("#key").value.trim(); const out=$("#testout");
-  if(!key){out.textContent="Incolla prima la chiave.";return;}
+  if(!key&&!$("#orkey").value.trim()){out.textContent="Incolla prima la chiave.";return;}
   out.textContent="Controllo…";
   try{ const names=await listModels(key); const m=($("#model").value.trim()||"auto")==="auto"?pickModel(names):$("#model").value.trim();
        const ok=names.includes(m);
        out.innerHTML=`Chiave valida: ${names.length} modelli disponibili.<br>Modello che verrà usato: <b>${esc(m||"nessuno")}</b>${ok?"":" (non presente nell'elenco!)"}`; }
   catch(e){ out.textContent=`Errore ${e.status||""}: ${e.detail||"impossibile collegarsi"}`; }
+  const ok=$("#orkey").value.trim();
+  if(ok){ try{ const r=await fetch("https://openrouter.ai/api/v1/key",{headers:{"Authorization":"Bearer "+ok}}); out.innerHTML+=r.ok?"<br>Riserva OpenRouter: chiave valida.":`<br>Riserva OpenRouter: errore ${r.status}.`; }catch(e){ out.innerHTML+="<br>Riserva OpenRouter: impossibile collegarsi."; } }
 };
-$("#savekey").onclick=()=>{LS.set("autoModel",null);LS.set("fast",$("#fast").checked);LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
+$("#savekey").onclick=()=>{LS.set("autoModel",null);LS.set("orkey",$("#orkey").value.trim());LS.set("fast",$("#fast").checked);LS.set("key",$("#key").value.trim());LS.set("model",($("#model").value.trim()||DEFAULT_MODEL));showSetup(false);};
 // ---------- photos
 async function shrink(file){
   const url=URL.createObjectURL(file);
@@ -295,14 +299,14 @@ async function resolveModel(key,force){
   if(!name) throw {friendly:"Con questa chiave non trovo un modello Gemini adatto.",detail:"Nessun modello 'flash' disponibile"};
   LS.set("autoModel",{name,day:todayKey()}); return name;
 }
-async function gemini(parts,opt={}){
-  const key=LS.get("key",""); if(!key){showSetup(true);throw {friendly:"Prima serve la chiave: chiedi ai tuoi genitori di inserirla."};}
+async function geminiCall(parts,opt={}){
+  const key=LS.get("key","");
   const body=opt.plain?{contents:[{role:"user",parts}],tools:opt.tools||undefined}
                       :{contents:[{role:"user",parts}],generationConfig:{responseMimeType:"application/json",responseSchema:opt.schema||SCHEMA}};
   let model;
   try{ model=await resolveModel(key,false); }
   catch(e){ if(e.friendly) throw e; if(e.status===400||e.status===401||e.status===403) throw {friendly:"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).",detail:`${e.status} – ${e.detail}`}; model="gemini-flash-latest"; }
-  let triedRefresh=false, noThink=false; const t0=Date.now();
+  let triedRefresh=false, noThink=false, switched=false; const t0=Date.now();
   const thinkFor=m=>{const v=parseFloat((m.match(/gemini-(\d+(?:\.\d+)?)/)||[])[1]||0); if(v>=3) return {thinkingLevel:"low"}; if(v>=2.5) return {thinkingBudget:0}; return null;};
   for(let attempt=0;attempt<4;attempt++){
     let r;
@@ -310,29 +314,85 @@ async function gemini(parts,opt={}){
     body.generationConfig=Object.assign({},body.generationConfig||{}); if(tc) body.generationConfig.thinkingConfig=tc; else delete body.generationConfig.thinkingConfig;
     if(!Object.keys(body.generationConfig).length) delete body.generationConfig;
     try{ r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)}); }
-    catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova.",detail:String(e&&e.message||e)}; }
+    catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova.",detail:String(e&&e.message||e),status:0}; }
     let j=null, msg=""; try{ j=await r.json(); msg=(j&&j.error&&j.error.message)||""; }catch(e){}
     const detail=`${r.status} – ${model}${msg?" – "+msg:""}`;
     if(r.status===404&&!triedRefresh){ triedRefresh=true; LS.set("autoModel",null); if(LS.get("model","auto")!=="auto") LS.set("model","auto"); try{ model=await resolveModel(key,true); continue; }catch(e){ throw {friendly:"Il modello di Gemini non è più disponibile.",detail}; } }
     if(r.status===400&&!noThink&&/think/i.test(msg)){ noThink=true; continue; }
+    if((r.status===500||r.status===503)&&!switched){ switched=true; const alt=await altGemini(key,model); if(alt){ model=alt; continue; } }
     if((r.status===500||r.status===503)&&attempt<2){ await new Promise(s=>setTimeout(s,2500)); continue; }
-    if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto.",detail};
+    if(r.status===429) throw {friendly:"Troppe richieste in poco tempo: riprova tra un minuto.",detail,status:429};
     if(r.status===400||r.status===401||r.status===403){ if(opt.plain&&opt.tools&&!/key/i.test(msg)) throw {toolfail:true,detail}; throw {friendly:/API key|api_key|permission|PERMISSION/i.test(msg)?"La chiave non funziona: chiedi ai tuoi genitori di controllarla (rotellina in alto).":"La richiesta non è andata a buon fine: riprova con foto più nitide o con il testo.",detail}; }
-    if(!r.ok) throw {friendly:r.status===503?"Gemini è sovraccarico in questo momento: riprova tra qualche minuto.":"Il servizio non risponde ora: riprova tra poco.",detail};
+    if(!r.ok) throw {friendly:r.status===503?"Gemini è sovraccarico in questo momento: riprova tra qualche minuto.":"Il servizio non risponde ora: riprova tra poco.",detail,status:r.status};
     const txt=j?.candidates?.[0]?.content?.parts?.filter(p=>!p.thought).map(p=>p.text||"").join("")||"";
     LS.set("lastRun",{sec:Math.round((Date.now()-t0)/1000),model,when:new Date().toLocaleString("it-IT")});
     if(!txt) throw {friendly:"Gemini non ha restituito una risposta: riprova.",detail:`${detail} – ${j?.promptFeedback?.blockReason||j?.candidates?.[0]?.finishReason||"vuota"}`};
     if(opt.plain) return txt;
     try{return JSON.parse(txt.replace(/^```json|```$/g,"").trim());}catch(e){throw {friendly:"Non sono riuscita a leggere bene la ricetta: prova con foto più nitide o incolla il testo.",detail:"risposta non in formato JSON"};}
   }
-  throw {friendly:"Il servizio non risponde ora: riprova tra poco.",detail:"tentativi esauriti"};
+  throw {friendly:"Il servizio non risponde ora: riprova tra poco.",detail:"tentativi esauriti",status:503};
+}
+async function altGemini(key,cur){
+  try{
+    const bad=/(tts|image|live|audio|embed|transcribe|omni|robotics|computer|thinking|exp)/i;
+    const ver=n=>{const m=n.match(/gemini-(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):0;};
+    const n=(await listModels(key)).filter(x=>x!==cur&&/flash/.test(x)&&!bad.test(x)).sort((a,b)=>ver(b)-ver(a));
+    return n.find(x=>/lite/.test(x)&&!/preview/.test(x))||n.find(x=>!/preview|latest/.test(x))||n[0]||null;
+  }catch(e){return null;}
+}
+// ---------- servizio di riserva: OpenRouter (modelli gratuiti)
+let orModelsCache=null;
+async function orModels(needImage,needJson){
+  if(!orModelsCache){ const r=await fetch("https://openrouter.ai/api/v1/models"); const j=await r.json(); orModelsCache=j.data||[]; }
+  let m=orModelsCache.filter(x=>String(x.id).endsWith(":free"));
+  if(needImage) m=m.filter(x=>((x.architecture&&x.architecture.input_modalities)||[]).includes("image"));
+  if(needJson){ const js=m.filter(x=>(x.supported_parameters||[]).includes("response_format")); if(js.length) m=js; }
+  m.sort((a,b)=>(b.context_length||0)-(a.context_length||0));
+  return m.slice(0,3).map(x=>x.id);
+}
+async function openrouter(parts,opt={}){
+  const key=LS.get("orkey","");
+  const hasImg=parts.some(p=>p.inline_data);
+  const content=parts.map(p=>p.inline_data?{type:"image_url",image_url:{url:`data:${p.inline_data.mime_type};base64,${p.inline_data.data}`}}:{type:"text",text:p.text||""});
+  if(!opt.plain) content.push({type:"text",text:"Rispondi SOLO con un oggetto JSON valido, senza testo prima o dopo, che segue questo schema: "+JSON.stringify(opt.schema||SCHEMA)});
+  let models=[]; try{ models=await orModels(hasImg,!opt.plain); }catch(e){}
+  if(!models.length) models=["openrouter/free"];
+  const body={model:models[0],models,messages:[{role:"user",content}]};
+  if(!opt.plain) body.response_format={type:"json_object"};
+  const t0=Date.now(); let r;
+  try{ r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key,"X-Title":"La mia porzione"},body:JSON.stringify(body)}); }
+  catch(e){ throw {friendly:"Non riesco a collegarmi: controlla la connessione e riprova.",detail:"OpenRouter: "+String(e&&e.message||e),status:0}; }
+  let j=null; try{ j=await r.json(); }catch(e){}
+  const msg=(j&&j.error&&j.error.message)||""; const used=(j&&j.model)||models[0]; const detail=`OpenRouter ${r.status} – ${used}${msg?" – "+msg:""}`;
+  if(r.status===401||r.status===403) throw {friendly:"La chiave di riserva (OpenRouter) non funziona: controllala nella rotellina.",detail,status:r.status};
+  if(r.status===429) throw {friendly:"Limite di richieste raggiunto anche sul servizio di riserva: riprova più tardi.",detail,status:429};
+  if(!r.ok) throw {friendly:"Il servizio non risponde ora: riprova tra poco.",detail,status:r.status};
+  const txt=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+  LS.set("lastRun",{sec:Math.round((Date.now()-t0)/1000),model:"OpenRouter · "+used,when:new Date().toLocaleString("it-IT")});
+  if(!txt) throw {friendly:"Nessuna risposta: riprova.",detail,status:r.status};
+  if(opt.plain) return txt;
+  const a=txt.indexOf("{"), b=txt.lastIndexOf("}");
+  try{ return JSON.parse(txt.slice(a,b+1)); }catch(e){ throw {friendly:"Non sono riuscita a leggere bene la risposta: riprova.",detail:detail+" – JSON non valido",status:r.status}; }
+}
+// ---------- chiamata con riserva automatica
+async function gemini(parts,opt={}){
+  const gk=LS.get("key",""), ok=LS.get("orkey","");
+  if(!gk&&!ok){showSetup(true);throw {friendly:"Prima serve una chiave: chiedi ai tuoi genitori di inserirla."};}
+  if(!gk){ if(opt.tools) throw {toolfail:true}; return openrouter(parts,opt); }
+  try{ return await geminiCall(parts,opt); }
+  catch(e){
+    if(ok&&!opt.tools&&(e.status===0||e.status===429||e.status>=500)){
+      try{ return await openrouter(parts,opt); }catch(e2){ e2.detail=`Gemini: ${e.detail||""} | Riserva: ${e2.detail||""}`; throw e2; }
+    }
+    throw e;
+  }
 }
 
 // ---------- web page
 async function pageText(url){
   try{ const t=await gemini([{text:"Apri questa pagina e riporta SOLO il testo completo della ricetta che contiene (titolo, porzioni, ingredienti con quantità, procedimento), senza commenti. Se non c'è una ricetta scrivi soltanto NESSUNA RICETTA.\n"+url}],{plain:true,tools:[{url_context:{}}]});
        if(t&&t.trim().length>40) return t; }
-  catch(e){ if(e&&e.friendly&&!e.toolfail) throw e; }
+  catch(e){ if(e&&e.friendly&&/chiave/i.test(e.friendly)) throw e; }
   try{ const r=await fetch("https://r.jina.ai/"+url); if(r.ok){ const t=await r.text(); if(t.trim().length>40) return t.slice(0,40000); } }catch(e){}
   throw {friendly:"Non riesco ad aprire questa pagina: copia il testo della ricetta e incollalo nella scheda Testo."};
 }
@@ -535,7 +595,7 @@ async function renderTip(){
   $("#tipsrc").innerHTML="Fonte: "+(f.u?`<a href="${f.u}" target="_blank" rel="noopener">${esc(f.t)}</a>`:esc(f.t));
   const cached=LS.get("tip",null);
   if(cached&&cached.day===todayKey()&&cached.base===txt){$("#tiptext").textContent=cached.text;return;}
-  if(!LS.get("key","")) return;
+  if(!LS.get("key","")&&!LS.get("orkey","")) return;
   try{
     const out=await gemini([{text:`Riscrivi questo messaggio per una ragazza di 15 anni, con parole tue, tono amichevole e positivo, in una o due frasi brevi. Non aggiungere informazioni, numeri, consigli o fonti nuove e non togliere il senso. Non parlare di peso, calorie, diete o aspetto fisico. Rispondi solo con il testo.\nMessaggio: «${txt}»`}],{plain:true});
     const t=String(out||"").trim().replace(/^["«]|["»]$/g,"");
@@ -619,7 +679,7 @@ $("#makeshop").onclick=async()=>{
   finally{ btn.disabled=false; $("#shopstatus").textContent=""; }
 };
 renderNope(); renderShop();
-renderMeals(); renderSaved(); renderWeek(); renderTip(); if(!LS.get("key","")) showSetup(true);
+renderMeals(); renderSaved(); renderWeek(); renderTip(); if(!LS.get("key","")&&!LS.get("orkey","")) showSetup(true);
 </script>
 </body>
 </html>

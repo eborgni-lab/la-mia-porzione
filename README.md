@@ -15,6 +15,14 @@ App web (da aggiungere alla schermata Home dell'iPhone) che legge una ricetta da
 2. Consigliato: nella Google Cloud Console, alla voce della chiave, imposta la restrizione **Siti web (HTTP referrer)** con `https://TUONOME.github.io/*`. Così la chiave funziona solo dalla tua pagina.
 3. Sul telefono della ragazza apri l'indirizzo della pagina in Safari: al primo avvio compare la schermata di impostazione. Incolla la chiave e premi **Salva**. Resta salvata solo su quel telefono.
 
+## Servizio di riserva (facoltativo): OpenRouter
+
+1. Crea un account gratuito su https://openrouter.ai e una chiave su https://openrouter.ai/keys (non serve la carta di credito).
+2. Nella rotellina dell'app incolla la chiave nel campo **Riserva** e premi **Salva**. Con **Prova la connessione** verifichi che sia valida.
+3. L'app usa OpenRouter solo se Gemini è sovraccarico (errore 503), ha raggiunto i limiti (429) o non risponde. Sceglie da sola tra i modelli gratuiti disponibili in quel momento, con lettura delle foto se servono.
+4. Limiti dei modelli gratuiti: 20 richieste al minuto e 50 al giorno (1000 al giorno dopo un acquisto una tantum di 10 crediti).
+5. I modelli gratuiti di OpenRouter sono offerti da fornitori diversi, che possono conservare i dati inviati: vale la stessa regola di Gemini, niente dati personali nelle foto.
+
 ## Installazione sull'iPhone
 
 In Safari: pulsante **Condividi → Aggiungi alla schermata Home**. L'app si apre a schermo intero come un'app normale.
